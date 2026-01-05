@@ -46,7 +46,7 @@
             </div>
 
             <nav class="hidden md:flex gap-10 font-semibold items-center">
-                <a href="#"
+                <a href="index.php"
                     class="relative hover:text-yellow-600 transition-colors after:content-[''] after:absolute after:w-0 after:h-[2px] after:bg-yellow-600 after:bottom-[-4px] after:left-0 hover:after:w-full after:transition-all">Home</a>
 
                 <div class="group static md:relative">
@@ -101,20 +101,88 @@
                     </div>
                 </div>
 
-                <a href="#" class="relative hover:text-yellow-600 transition-colors py-4">About</a>
-                <a href="#" class="relative hover:text-yellow-600 transition-colors py-4">Inquiry</a>
-                <a href="#" class="relative hover:text-yellow-600 transition-colors py-4">Contact</a>
+                <a href="about.php" class="relative hover:text-yellow-600 transition-colors py-4">About</a>
+                <a href="inquiry.php" class="relative hover:text-yellow-600 transition-colors py-4">Inquiry</a>
+                <a href="contact.php" class="relative hover:text-yellow-600 transition-colors py-4">Contact</a>
             </nav>
 
             <div class="flex items-center gap-6">
-                <div class="p-2 hover:bg-gray-100 rounded-full cursor-pointer transition-colors"
-                    onclick="toggleSearch()">
-                    <i class="fa fa-search text-gray-700"></i>
+                <div class="relative">
+                    <input type="text" id="searchInput" onkeyup="searchProducts()"
+                        placeholder="Search luxury products..."
+                        class="pl-10 pr-4 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <i class="fa fa-search absolute left-3 top-2.5 text-gray-400"></i>
                 </div>
-                <div class="relative p-2 hover:bg-gray-100 rounded-full cursor-pointer transition-colors">
-                    <i class="fa fa-shopping-bag text-gray-700"></i>
-                    <span
-                        class="absolute top-0 right-0 bg-yellow-600 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-white">0</span>
+
+
+
+
+
+                <div class="relative group/cart flex items-center">
+                    <div onclick="window.location.href='cart.php'"
+                        class="relative flex items-center gap-3 px-5 py-2.5 bg-gray-50 rounded-full border border-gray-100 hover:border-yellow-500 hover:bg-yellow-50 transition-all duration-300 cursor-pointer shadow-sm active:scale-95">
+
+                        <div class="relative">
+                            <i
+                                class="fa-solid fa-basket-shopping text-gray-800 text-xl group-hover/cart:text-yellow-600 transition-colors"></i>
+                            <span id="cart-count-badge"
+                                class="absolute -top-2 -right-2 bg-black text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-md">
+                                <?php echo isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : '0'; ?>
+                            </span>
+                        </div>
+
+                        <div class="hidden lg:flex flex-col items-start leading-none">
+                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-[2px]">My Inquiry</span>
+                            <span id="cart-subtotal-nav"
+                                class="text-sm font-black text-gray-800 tracking-tight">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="absolute right-0 top-full mt-4 w-[450px] bg-white rounded-[2rem] shadow-[0_35px_120px_rgba(0,0,0,0.2)] border border-gray-50 p-8 z-[150] invisible opacity-0 group-hover/cart:visible group-hover/cart:opacity-100 transition-all duration-500 transform origin-top-right group-hover/cart:translate-y-0 translate-y-6">
+
+                        <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-100">
+                            <div>
+                                <h3 class="text-lg font-black text-black uppercase tracking-tighter">Inquiry Basket</h3>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Review your
+                                    selected items</p>
+                            </div>
+                            <span
+                                class="text-[11px] font-bold bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full uppercase">Wholesale
+                                List</span>
+                        </div>
+
+                        <div id="cart-items-container"
+                            class="max-h-[380px] overflow-y-auto mb-8 pr-4 custom-scrollbar space-y-5">
+                            <div class="flex flex-col items-center justify-center py-12 opacity-30">
+                                <i class="fa-solid fa-spinner fa-spin text-3xl mb-4"></i>
+                                <p class="text-xs font-bold tracking-widest uppercase">Fetching Details...</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-5">
+                            <!-- <div
+                                class="flex justify-between items-center p-5 bg-gray-50 rounded-2xl border border-gray-100">
+                                <span class="text-xs font-black text-gray-400 uppercase tracking-[2px]">Total Est.
+                                    Value</span>
+                                <span id="cart-subtotal"
+                                    class="text-2xl font-black text-black tracking-tighter">₹0.00</span>
+                            </div> -->
+
+                            <div class="width-full flex flex-col gap-3">
+                                <!-- <a href="cart.php"
+                                    class="w-full text-center py-4 text-[11px] font-black uppercase tracking-widest bg-black text-white rounded-2xl hover:bg-yellow-600 transition-all duration-300 shadow-xl shadow-black/10 flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-layer-group"></i> Full List
+                                </a> -->
+                                <a href="inquiry.php"
+                                    class="w-full text-center py-4 text-[11px] font-black uppercase tracking-widest border-2 border-gray-900 text-black rounded-2xl hover:bg-black hover:text-white transition-all duration-300">
+                                    Send Inquiry
+                                </a>
+                            </div>
+                            <p class="text-[9px] text-gray-400 text-center uppercase font-medium tracking-widest">Prices
+                                are subject to wholesale quantities</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="p-2 hover:bg-gray-100 rounded-full cursor-pointer transition-colors">
                     <i class="fa fa-moon text-gray-700"></i>
@@ -216,29 +284,67 @@
     </script>
 
     <script>
-    function liveSearch(query) {
-        let resultsDiv = document.getElementById('live-results');
-        let defaultDiv = document.getElementById('default-suggestions');
+    function searchProducts() {
+        const query = document.getElementById('searchInput').value;
+        const container = document.getElementById('product-container');
 
-        if (query.length > 1) {
-            // AJAX Request
-            let xhr = new XMLHttpRequest();
-            xhr.open("POST", "search_api.php", true);
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        // જો સર્ચ બોક્સ ખાલી હોય તો બધી પ્રોડક્ટ્સ બતાવો
+        if (query.length < 1) {
+            // તમે ઈચ્છો તો અહીં default loadProducts(0) કોલ કરી શકો
+        }
 
-            xhr.onload = function() {
-                if (this.status == 200) {
-                    resultsDiv.innerHTML = this.responseText;
-                    resultsDiv.classList.remove('hidden');
-                    defaultDiv.classList.add('hidden'); // Type karo tyare trendy suggestions chhupavi do
+        fetch('get_products_by_cat.php?search=' + encodeURIComponent(query))
+            .then(response => response.text())
+            .then(data => {
+                container.innerHTML = data;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // કાર્ટની પ્રોડક્ટ્સ લાઈવ મેળવવા માટે
+    function fetchCartDetails() {
+        const container = document.getElementById('cart-items-container');
+        const totalDisplay = document.getElementById('cart-subtotal');
+        const countBadge = document.getElementById('cart-count-badge');
+
+        fetch('fetch_cart_dropdown.php', {
+                cache: 'no-cache'
+            })
+            .then(response => response.text()) // પહેલા text તરીકે લો જેથી ભૂલ પકડાય
+            .then(text => {
+                try {
+                    const data = JSON.parse(text); // હવે તેને JSON માં ફેરવો
+                    container.innerHTML = data.html;
+                    if (totalDisplay) totalDisplay.innerText = "₹" + data.total;
+                    if (countBadge) countBadge.innerText = data.count;
+                } catch (err) {
+                    console.error("Server sent invalid JSON:", text);
+                    container.innerHTML = '<p class="text-[10px] text-red-500 text-center">Server Data Error</p>';
                 }
-            };
-            xhr.send("query=" + query);
-        } else {
-            resultsDiv.classList.add('hidden');
-            defaultDiv.classList.remove('hidden'); // Khali hoy tyare default batavo
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+            });
+    }
+
+    // હોવર ઇવેન્ટ લિસ્ટનર
+    document.addEventListener('DOMContentLoaded', () => {
+        const cartIcon = document.querySelector('.group\\/cart');
+        if (cartIcon) {
+            cartIcon.addEventListener('mouseenter', fetchCartDetails);
+        }
+    });
+
+    // કાર્ટ કાઉન્ટ અપડેટ કરવા માટે (તમારા જૂના કોડમાં સુધારો)
+    function updateCartCount(count) {
+        const cartBadge = document.getElementById('cart-count-badge');
+        if (cartBadge) {
+            cartBadge.innerText = count;
         }
     }
+
+    // જ્યારે યુઝર કાર્ટ આઈકન પર હોવર કરે ત્યારે ડેટા લોડ કરો
+    document.querySelector('.group\\/cart').addEventListener('mouseenter', fetchCartDetails);
 
     // Search Toggle function ma thodo badlav
     function toggleSearch() {
@@ -262,4 +368,28 @@
             document.body.style.overflow = 'auto';
         }
     }
+
+    function addToInquiry(productId) {
+        const formData = new FormData();
+        formData.append('product_id', productId);
+        formData.append('quantity', 1); // બલ્ક માટે ડિફોલ્ટ ૧, યુઝર લિસ્ટ પેજ પર બદલી શકશે
+
+        fetch('add_to_cart_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateCartCount(data.new_count);
+                    if (typeof fetchCartDetails === "function") fetchCartDetails(); // ડ્રોપડાઉન અપડેટ કરવા
+                    alert('Item added to your inquiry list!');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    // ... existing fetch logic ...
+    const totalNav = document.getElementById('cart-subtotal-nav'); // નવો વેરિએબલ
+    // Inside your then(data => { ... })
+    if (totalNav) totalNav.innerText = "₹" + data.total;
     </script>

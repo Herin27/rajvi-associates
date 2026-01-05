@@ -1,17 +1,26 @@
 <?php
-include 'db.php'; // તમારું ડેટાબેઝ કનેક્શન
+include 'db.php'; // ડેટાબેઝ કનેક્શન
 
-// બધી પ્રોડક્ટ્સ અથવા લેટેસ્ટ 8 પ્રોડક્ટ્સ મેળવો
-$prod_query = mysqli_query($conn, "SELECT * FROM products ORDER BY id DESC LIMIT 8");
+// AJAX દ્વારા મોકલેલી Category ID મેળવો
+$cat_id = isset($_GET['category_id']) ? $_GET['category_id'] : 0;
 
-if(mysqli_num_rows($prod_query) > 0) {
-    while($row = mysqli_fetch_assoc($prod_query)) {
-        // જો ડિસ્કાઉન્ટ ગણવું હોય તો (Optional)
+// જો cat_id હોય તો તે કેટેગરીની પ્રોડક્ટ્સ લો, નહીંતર બધી બતાવો
+$query = "SELECT * FROM products";
+if($cat_id > 0) {
+    $query .= " WHERE category_id = '$cat_id'";
+}
+$query .= " ORDER BY id DESC";
+
+$res = mysqli_query($conn, $query);
+
+if(mysqli_num_rows($res) > 0) {
+    while($row = mysqli_fetch_assoc($res)) {
+        // ડિસ્કાઉન્ટ ગણતરી
         $discount = 0;
-        if($row['original_price'] > 0) {
+        if(isset($row['original_price']) && $row['original_price'] > 0) {
             $discount = round((($row['original_price'] - $row['discounted_price']) / $row['original_price']) * 100);
         }
-?>
+        ?>
 <div
     class="group bg-white rounded-3xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
     <div class="relative h-64 bg-gray-50 overflow-hidden">
@@ -51,12 +60,11 @@ if(mysqli_num_rows($prod_query) > 0) {
 
         <div class="flex items-baseline gap-2 mb-5">
             <span class="text-xl font-bold text-black">$<?php echo $row['discounted_price']; ?></span>
-            <?php if($row['original_price'] > $row['discounted_price']): ?>
+            <?php if(isset($row['original_price']) && $row['original_price'] > $row['discounted_price']): ?>
             <span class="text-sm text-gray-400 line-through">$<?php echo $row['original_price']; ?></span>
             <?php endif; ?>
-
-
         </div>
+
         <div class="flex flex-col gap-2 mb-5">
             <button onclick="addToCart(<?php echo $row['id']; ?>)"
                 class="w-full bg-black hover:bg-yellow-600 text-white py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 group/btn">
@@ -68,13 +76,15 @@ if(mysqli_num_rows($prod_query) > 0) {
                 <i class="fa fa-list-plus"></i> Add to Inquiry
             </button>
         </div>
-
     </div>
 </div>
-<?php 
+<?php
     }
 } else {
-    echo "<p class='col-span-4 text-center text-gray-500'>No products found.</p>";
+    echo "<div class='col-span-4 text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-100'>
+            <i class='fa fa-box-open text-gray-300 text-5xl mb-4'></i>
+            <p class='text-gray-500 font-medium'>આ કેટેગરીમાં હાલમાં કોઈ પ્રોડક્ટ ઉપલબ્ધ નથી.</p>
+          </div>";
 }
 ?>
 

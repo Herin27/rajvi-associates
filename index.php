@@ -1,3 +1,10 @@
+<!-- <?php 
+$features_array = explode(',', $row['key_features']); 
+foreach($features_array as $feature) {
+    echo "<li><i class='fa fa-check text-orange-500'></i> ".trim($feature)."</li>";
+}
+?> -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,59 +33,35 @@
                     <span
                         class="bg-black text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Shop
                         By Sport</span>
-                    <h2 class="text-4xl font-serif font-bold text-gray-900 mt-3">Sports Categories</h2>
+                    <h2 class="text-4xl font-serif font-bold text-gray-900 mt-3">All Categories</h2>
                 </div>
                 <a href="#" class="text-gray-500 hover:text-black font-semibold flex items-center gap-2 transition">
-                    View All Sports <i class="fa fa-arrow-right text-xs"></i>
+                    View All <i class="fa fa-arrow-right text-xs"></i>
                 </a>
             </div>
 
             <div class="flex gap-6 overflow-x-auto pb-8 no-scrollbar">
                 <?php
-                $cat_query = mysqli_query($conn, "SELECT * FROM categories");
-                while($cat = mysqli_fetch_assoc($cat_query)) {
-                ?>
-                <div class="flex flex-col items-center min-w-[120px] group cursor-pointer">
+    $cat_query = mysqli_query($conn, "SELECT * FROM categories");
+    while($cat = mysqli_fetch_assoc($cat_query)) {
+    ?>
+                <div class="flex flex-col items-center min-w-[120px] group cursor-pointer"
+                    onclick="loadProducts(<?php echo $cat['id']; ?>)">
                     <div
                         class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center border border-gray-100 group-hover:border-yellow-500 group-hover:shadow-xl transition-all duration-300">
                         <img src="<?php echo $cat['image_path']; ?>"
                             class="w-12 h-12 object-contain group-hover:scale-110 transition-transform">
                     </div>
                     <span
-                        class="mt-4 text-xs font-bold uppercase tracking-tighter text-gray-600 group-hover:text-black"><?php echo $cat['name']; ?></span>
+                        class="mt-4 text-xs font-bold uppercase tracking-tighter text-gray-600 group-hover:text-black">
+                        <?php echo $cat['name']; ?>
+                    </span>
                 </div>
                 <?php } ?>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
-                <?php for($i=1; $i<=4; $i++) { ?>
-                <div
-                    class="group bg-white rounded-3xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-500">
-                    <div class="relative h-72 bg-gray-50 overflow-hidden">
-                        <span
-                            class="absolute top-4 left-4 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-lg z-10">-20%</span>
-                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-all duration-700">
-                        <button
-                            class="absolute bottom-4 right-4 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all">
-                            <i class="fa fa-heart text-gray-400 hover:text-red-500"></i>
-                        </button>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="font-bold text-gray-800 text-lg mb-1">Premium Running Shoes</h4>
-                        <div class="flex text-yellow-400 text-[10px] mb-3">
-                            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i
-                                class="fa fa-star"></i><i class="fa fa-star"></i>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-bold text-black">$120.00</span>
-                            <button class="bg-yellow-500 text-white p-2 rounded-lg hover:bg-black transition">
-                                <i class="fa fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <?php } ?>
+            <div id="product-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
+                <?php include('fetch_products.php'); ?>
             </div>
         </section>
 
@@ -86,7 +69,7 @@
             <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10">
                 <div class="flex flex-col items-center text-center group">
                     <div
-                        class="w-16 h-16 bg-[#FFB549] rounded-full flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform">
+                        class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform">
                         <i class="fa fa-gem text-white text-2xl"></i>
                     </div>
                     <h5 class="font-bold text-gray-800 uppercase text-sm tracking-widest">Premium Quality</h5>
@@ -94,7 +77,7 @@
                 </div>
                 <div class="flex flex-col items-center text-center group">
                     <div
-                        class="w-16 h-16 bg-[#FFB549] rounded-full flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform">
+                        class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform">
                         <i class="fa fa-user-tie text-white text-2xl"></i>
                     </div>
                     <h5 class="font-bold text-gray-800 uppercase text-sm tracking-widest">Personal Service</h5>
@@ -102,7 +85,7 @@
                 </div>
                 <div class="flex flex-col items-center text-center group">
                     <div
-                        class="w-16 h-16 bg-[#FFB549] rounded-full flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform">
+                        class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform">
                         <i class="fa fa-truck-fast text-white text-2xl"></i>
                     </div>
                     <h5 class="font-bold text-gray-800 uppercase text-sm tracking-widest">White Glove Service</h5>
@@ -110,7 +93,7 @@
                 </div>
                 <div class="flex flex-col items-center text-center group">
                     <div
-                        class="w-16 h-16 bg-[#FFB549] rounded-full flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform">
+                        class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform">
                         <i class="fa fa-award text-white text-2xl"></i>
                     </div>
                     <h5 class="font-bold text-gray-800 uppercase text-sm tracking-widest">Exclusive Access</h5>
@@ -184,7 +167,7 @@
             </div>
         </section>
 
-        <section class="py-20 bg-[#FFB549]">
+        <section class="py-20 bg-yellow-500">
             <div class="max-w-4xl mx-auto text-center px-6">
                 <h2 class="text-4xl font-serif font-bold text-gray-900 mb-4">Ready to Experience Luxury?</h2>
                 <p class="text-gray-800 mb-10 font-medium">Get personalized recommendations from our luxury specialists
@@ -218,7 +201,7 @@
                         Sunday: 11:00 AM - 6:00 PM
                     </p>
                     <a href="#"
-                        class="inline-flex items-center gap-2 bg-[#FFB549] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md hover:shadow-xl transition">
+                        class="inline-flex items-center gap-2 bg-yellow-500 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md hover:shadow-xl transition">
                         <i class="fa fa-map"></i> Get Directions
                     </a>
                 </div>
@@ -230,71 +213,50 @@
             </div>
         </section>
 
-        <footer class="bg-[#FFFDF5] pt-20 pb-10 border-t border-gray-100">
-            <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 pb-16">
-                <div>
-                    <div class="flex items-center gap-2 mb-6">
-                        <img src="./assets/image/logo.png" class="w-10">
-                        <span class="text-lg font-bold text-yellow-600 uppercase">Luxury Store</span>
-                    </div>
-                    <p class="text-gray-500 text-xs leading-relaxed mb-6">Premium luxury products with personalized
-                        service. Experience excellence in every purchase.</p>
-                    <div class="flex gap-4">
-                        <a href="#"
-                            class="w-8 h-8 rounded-full bg-[#FFB549] text-white flex items-center justify-center hover:scale-110 transition"><i
-                                class="fa-brands fa-facebook-f text-xs"></i></a>
-                        <a href="#"
-                            class="w-8 h-8 rounded-full bg-[#FFB549] text-white flex items-center justify-center hover:scale-110 transition"><i
-                                class="fa-brands fa-instagram text-xs"></i></a>
-                        <a href="#"
-                            class="w-8 h-8 rounded-full bg-[#FFB549] text-white flex items-center justify-center hover:scale-110 transition"><i
-                                class="fa-brands fa-whatsapp text-xs"></i></a>
-                    </div>
-                </div>
-                <div>
-                    <h5 class="font-bold text-gray-800 text-sm mb-6 uppercase tracking-wider">Quick Links</h5>
-                    <ul class="space-y-3 text-xs text-gray-500">
-                        <li><a href="#" class="hover:text-yellow-600">Home</a></li>
-                        <li><a href="#" class="hover:text-yellow-600">About Us</a></li>
-                        <li><a href="#" class="hover:text-yellow-600">Categories</a></li>
-                        <li><a href="#" class="hover:text-yellow-600">Contact Us</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h5 class="font-bold text-gray-800 text-sm mb-6 uppercase tracking-wider">Categories</h5>
-                    <ul class="space-y-3 text-xs text-gray-500">
-                        <li><a href="#" class="hover:text-yellow-600">Fashion</a></li>
-                        <li><a href="#" class="hover:text-yellow-600">Accessories</a></li>
-                        <li><a href="#" class="hover:text-yellow-600">Home Decor</a></li>
-                        <li><a href="#" class="hover:text-yellow-600">Electronics</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h5 class="font-bold text-gray-800 text-sm mb-6 uppercase tracking-wider">Stay Updated</h5>
-                    <p class="text-gray-500 text-xs mb-4">Subscribe to get special offers and updates</p>
-                    <div class="bg-white border border-gray-100 rounded-full p-1 flex">
-                        <input type="email" placeholder="Enter your email"
-                            class="bg-transparent px-4 py-2 text-xs w-full outline-none">
-                        <button
-                            class="bg-[#FFB549] text-white px-6 py-2 rounded-full font-bold text-xs hover:bg-black transition">Subscribe</button>
-                    </div>
-                </div>
-            </div>
-            <div
-                class="max-w-7xl mx-auto px-6 pt-8 border-t border-gray-100 flex flex-wrap justify-between items-center text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                <p>© 2026 Luxury Store. All rights reserved.</p>
-                <div class="flex gap-6">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Powered by Readdy</a>
-                </div>
-            </div>
-        </footer>
+        <?php include('footer.php'); ?>
 
     </main>
     </main>
 
+    <script>
+    function loadProducts(catId) {
+        const container = document.getElementById('product-container');
+        container.innerHTML = '<div class="col-span-4 text-center py-10">Loading Products...</div>';
 
+        fetch('get_products_by_cat.php?category_id=' + catId)
+            .then(response => response.text())
+            .then(data => {
+                container.innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                container.innerHTML = 'Products could not be loaded.';
+            });
+    }
+
+    function addToCart(productId) {
+        const formData = new FormData();
+        formData.append('product_id', productId);
+        formData.append('quantity', 1);
+
+        fetch('add_to_cart_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // ૧. તરત જ કાર્ટની વિગતો ફરીથી ખેંચો
+                    fetchCartDetails();
+                    // ૨. એલર્ટ બતાવો (Optional: તમે Toast પણ વાપરી શકો)
+                    alert('Product added to cart!');
+                } else {
+                    alert('Error adding to cart');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    </script>
 
 
 
