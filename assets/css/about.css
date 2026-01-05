@@ -12,6 +12,7 @@
     --bg-light: #f8fafc;            /* Soft Gray Background */
 }
 
+
 /* 2. Global Helpers */
 .section-padding { padding: 100px 0; }
 .text-center { text-align: center; }
@@ -38,7 +39,7 @@
 
 /* 3. Our Story Section (Pure White) */
 .about-hero { 
-    background-color: var(--bg-white); 
+    background-color: #f8fafc; 
 }
 .about-grid { 
     display: grid; 
@@ -70,7 +71,7 @@
 
 /* 4. Vision & Mission Section (Larger Luxury Cards) */
 .vision-mission-section { 
-    background-color: #f3d1841c;
+    background-color: #f5f2e8;
     padding: 100px 0; 
 }
 
@@ -170,7 +171,7 @@
     width: 85px;
     height: 85px;
     background-color: var(--gold-vibrant); /* Solid yellow icon background photo mujab */
-    color: white;
+    color: #f8fafc;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -196,7 +197,7 @@
 
 /* 6. Meet Our Team Section (Light Gray Background) */
 .team-section { 
-    background-color: #f3d1841c; 
+    background-color: #f5f2e8; 
 }
 .team-grid { 
     display: grid; 

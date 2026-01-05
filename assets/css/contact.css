@@ -1,0 +1,210 @@
+/* assets/css/contact.css */
+
+:root {
+    --gold-vibrant: #f1b427;
+    --gold-dark: #ca8a04;
+    --text-dark: #0f172a;
+    --text-gray: #64748b;
+    --bg-light-gray: #f8fafc; /* For alternate section background */
+}
+
+.section-padding { 
+    padding: 80px 0; 
+}
+.section-padding-map { 
+    padding-bottom: 80px; 
+}
+.container { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 0 20px; 
+}
+
+/* Backgrounds for Sections */
+.contact-top-section { 
+    background-color: #f5f2e8;
+}
+.map-section-full { 
+    background-color: var(--bg-light-gray);  
+}
+.send-message-full { 
+    background-color: #f5f2e8;
+}
+.faq-modern-section { 
+    background-color: var(--bg-light-gray); 
+}
+
+/* Titles */
+.top-subtitle { 
+    color: var(--gold-vibrant); 
+    font-weight: 700; 
+    letter-spacing: 1.5px; 
+    font-size: 0.85rem; 
+    margin-bottom: 10px; 
+}
+.section-title { 
+    font-family: 'Playfair Display', serif; 
+    font-size: 3rem; 
+    color: var(--text-dark); 
+    margin-bottom: 15px; 
+}
+.section-title span { 
+    color: var(--gold-dark); 
+}
+.section-subtitle { 
+    color: var(--text-gray); 
+    font-size: 1rem; 
+    max-width: 600px; 
+    margin: 0 auto 50px; }
+
+/* 1. Info Cards with Hover Border */
+.contact-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.info-box {
+    background: #fff; 
+    padding: 40px 20px; 
+    border-radius: 20px; 
+    text-align: center;
+    border: 2px solid transparent; 
+    transition: 0.4s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+    cursor: pointer;
+}
+.info-box:hover { border-color: var(--gold-vibrant); transform: translateY(-10px); }
+.icon-circle {
+    width: 65px; height: 65px; background: var(--gold-vibrant); color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 1.6rem;
+}
+.info-box h4 { font-family: 'Playfair Display', serif; font-size: 1.25rem; margin-bottom: 10px; }
+.info-box p { font-size: 0.9rem; color: var(--text-gray); line-height: 1.5; margin-bottom: 15px; }
+.box-link { color: var(--gold-dark); text-decoration: none; font-weight: 700; font-size: 0.8rem; }
+
+/* 2. Map Full Width */
+.map-wrapper-centered { 
+    max-width: 1000px; 
+    margin: 0 auto; } /* Centering the map content */
+.map-container-box { 
+    border-radius: 30px; 
+    overflow: hidden; 
+    box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
+
+/* 3. Send Message Card */
+.form-card-main { 
+    background: #fff; 
+    padding: 60px; 
+    border-radius: 30px; 
+    box-shadow: 0 15px 50px rgba(0,0,0,0.03); 
+}
+.form-label-top{
+    color: #f1b427;
+    
+}
+.form-main-title { 
+    font-family: 'Playfair Display', serif; 
+    font-size: 2.5rem; 
+    margin-bottom: 40px; 
+    color: #0F172A;
+}
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
+.input-group label { display: block; font-weight: 600; margin-bottom: 10px; color: #334155; }
+.input-group input, .input-group textarea {
+    width: 100%; 
+    padding: 15px; 
+    border: 1px solid #e2e8f0; 
+    border-radius: 12px;
+    background: #fbfcfd; 
+    font-family: inherit; 
+    font-size: 1rem;
+}
+.input-group input:focus, .input-group textarea:focus { border-color: var(--gold-vibrant); outline: none; }
+
+.form-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px; }
+.btn-submit-gold {
+    background: #f1b427; 
+    color: #fff; 
+    border: none; 
+    padding: 18px;
+    border-radius: 12px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    font-size: 1rem; 
+    transition: 0.3s;
+}
+.btn-submit-gold:hover{
+    background-color: #ca8a04;
+}
+.btn-whatsapp-green {
+    border: 2px solid #22c55e; 
+    color: #22c55e; 
+    text-decoration: none;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 10px;
+    border-radius: 12px; 
+    font-weight: 700; 
+    transition: 0.3s;
+}
+.btn-whatsapp-green:hover{
+    background-color: #22c55e;
+    color: #ffffff;
+}
+
+/* 4. FAQ Section */
+.faq-header { 
+    margin-bottom: 50px; 
+}
+.faq-subtitle { 
+    color: var(--gold-vibrant); 
+    font-weight: 700; 
+    letter-spacing: 1px; 
+}
+.faq-main-title { 
+    font-family: 'Playfair Display', serif; 
+    font-size: 2.8rem; 
+    margin-top: 10px; 
+    color: #0F172A;
+}
+
+.faq-grid-layout { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 30px; 
+}
+.faq-card-item { 
+    background: #fff; 
+    padding: 40px; 
+    border-radius: 20px; 
+    border: 1px solid #f1f5f9; 
+    box-shadow: 0 5px 20px rgba(0,0,0,0.02); 
+    cursor: pointer;
+}
+.faq-card-item:hover { 
+    border-color: #f4bb40; 
+    transform: translateY(-2px);
+}
+.faq-question-head { 
+    font-weight: 700; 
+    font-size: 1.1rem; 
+    color: var(--text-dark); 
+    margin-bottom: 15px; 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+}
+.faq-question-head i { 
+    color: var(--gold-vibrant); 
+    font-size: 1.3rem; 
+}
+.faq-answer { 
+    color: var(--text-gray); 
+    line-height: 1.7; 
+    font-size: 0.95rem; 
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .contact-grid-4 { grid-template-columns: 1fr 1fr; }
+    .form-row, .form-actions, .faq-grid-layout { grid-template-columns: 1fr; }
+}

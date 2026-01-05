@@ -50,9 +50,9 @@ if(mysqli_num_rows($prod_query) > 0) {
         </div>
 
         <div class="flex items-baseline gap-2 mb-5">
-            <span class="text-xl font-bold text-black">$<?php echo $row['discounted_price']; ?></span>
+            <span class="text-xl font-bold text-black"><?php echo $row['discounted_price']; ?></span>
             <?php if($row['original_price'] > $row['discounted_price']): ?>
-            <span class="text-sm text-gray-400 line-through">$<?php echo $row['original_price']; ?></span>
+            <span class="text-sm text-gray-400 line-through"><?php echo $row['original_price']; ?></span>
             <?php endif; ?>
 
 
@@ -96,16 +96,16 @@ function addToCart(productId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('પ્રોડક્ટ કાર્ટમાં ઉમેરાઈ ગઈ છે!');
+                alert('Product added to cart successfully!');
                 // અહીં તમે હેડરમાં રહેલા કાર્ટ કાઉન્ટને પણ અપડેટ કરી શકો છો
                 updateCartCount(data.new_count);
             } else {
-                alert('કાર્ટમાં ઉમેરવામાં સમસ્યા આવી.');
+                alert('There was an issue adding the product to the cart.');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('કંઈક ભૂલ થઈ છે.');
+            alert('Something went wrong.');
         });
 }
 

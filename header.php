@@ -184,9 +184,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="p-2 hover:bg-gray-100 rounded-full cursor-pointer transition-colors">
-                    <i class="fa fa-moon text-gray-700"></i>
-                </div>
+
 
                 <div id="search-overlay"
                     class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] hidden flex-col items-center pt-10 px-4 transition-all duration-300">

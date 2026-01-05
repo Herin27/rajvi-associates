@@ -14,7 +14,7 @@
             <a href="#" class="btn btn-gold-rounded">Get in Touch</a>
         </div>
         <div class="about-image-wrapper">
-            <img src="assets/images/home4.jpg" alt="Store Interior" class="main-about-img">
+            <img src="./assets/image/home.jpg" alt="Store Interior" class="main-about-img">
             <div class="img-accent"></div>
         </div>
     </div>
