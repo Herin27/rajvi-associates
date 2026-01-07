@@ -14,6 +14,7 @@ if(isset($_POST['add_product'])) {
     $long_desc = mysqli_real_escape_string($conn, $_POST['long_desc']);
     $features = mysqli_real_escape_string($conn, $_POST['features']);
     $min_qty = $_POST['min_qty'];
+    $extra_details = isset($_POST['extra']) ? json_encode($_POST['extra']) : NULL;
 
     // Additional Images Handling
     $additional_images = [];
@@ -36,9 +37,8 @@ if(isset($_POST['add_product'])) {
     move_uploaded_file($_FILES['pimage']['tmp_name'], "uploads/" . $image);
 
     // SQL Query updated with brand and rating
-    $query = "INSERT INTO products (category_id, product_name, brand, sku, original_price, discounted_price, discount_percent, min_qty, rating, additional_images, available_units, short_description, long_description, key_features, image) 
-              VALUES ('$cat_id', '$name', '$brand', '$sku', '$o_price', '$d_price', '$discount_percent', '$min_qty', '$rating', '$extra_images_str', '$units', '$short_desc', '$long_desc', '$features', '$image')";
-    
+    $query = "INSERT INTO products (category_id, product_name, brand, sku, original_price, discounted_price, discount_percent, min_qty, rating, additional_images, available_units, short_description, long_description, key_features, category_details, image) 
+              VALUES ('$cat_id', '$name', '$brand', '$sku', '$o_price', '$d_price', '$discount_percent', '$min_qty', '$rating', '$extra_images_str', '$units', '$short_desc', '$long_desc', '$features', '$extra_details', '$image')";
 
     
     if(mysqli_query($conn, $query)) {
@@ -116,13 +116,20 @@ if(isset($_POST['add_product'])) {
 
             <div class="col-span-2 md:col-span-1">
                 <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Category</label>
-                <select name="category_id"
+                <select name="category_id" onchange="showDynamicFields(this.value)"
                     class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-black outline-none transition cursor-pointer">
+                    <option value="">Select Category</option>
                     <?php
-                    $cats = mysqli_query($conn, "SELECT * FROM categories");
-                    while($c = mysqli_fetch_assoc($cats)) echo "<option value='".$c['id']."'>".$c['name']."</option>";
-                    ?>
+        $cats = mysqli_query($conn, "SELECT * FROM categories");
+        while($c = mysqli_fetch_assoc($cats)) {
+            echo "<option value='".$c['id']."'>".$c['name']."</option>";
+        }
+        ?>
                 </select>
+            </div>
+
+            <div id="dynamic-fields"
+                class="col-span-2 grid grid-cols-2 gap-6 bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-200 hidden">
             </div>
 
             <div class="col-span-1">
@@ -204,5 +211,37 @@ if(isset($_POST['add_product'])) {
         </form>
     </div>
 </body>
+
+<script>
+function showDynamicFields(catId) {
+    const container = document.getElementById('dynamic-fields');
+
+    // જો Perfume (ID: 3) સિલેક્ટ થાય તો જ ફિલ્ડ્સ બતાવો
+    if (catId == "3") {
+        container.classList.remove('hidden');
+        container.innerHTML = `
+            <div class="col-span-2 border-b pb-2 mb-4">
+                <h3 class="text-sm font-black uppercase text-yellow-600 italic">Perfume Specialization Details</h3>
+            </div>
+            <div class="col-span-2 md:col-span-1">
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Scent / Fragrance Type</label>
+                <input type="text" name="extra[scent]" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-black outline-none transition" placeholder="e.g. Woody, Floral, Fresh" required>
+            </div>
+            <div class="col-span-2 md:col-span-1">
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Item Volume (ml)</label>
+                <input type="text" name="extra[volume]" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-black outline-none transition" placeholder="e.g. 100ml, 50ml" required>
+            </div>
+            <div class="col-span-2">
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Special Scent Features</label>
+                <input type="text" name="extra[scent_features]" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-black outline-none transition" placeholder="e.g. Long-lasting, Alcohol-free">
+            </div>
+        `;
+    } else {
+        // જો બીજી કોઈ કેટેગરી હોય તો આ સેક્શન છુપાવી દેવું
+        container.classList.add('hidden');
+        container.innerHTML = "";
+    }
+}
+</script>
 
 </html>

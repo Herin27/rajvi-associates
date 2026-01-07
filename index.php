@@ -74,7 +74,8 @@ foreach($features_array as $feature) {
                         By Sport</span>
                     <h2 class="text-4xl font-serif font-bold text-gray-900 mt-3">All Categories</h2>
                 </div>
-                <a href="#" class="text-gray-500 hover:text-black font-semibold flex items-center gap-2 transition">
+                <a href="category.php"
+                    class="text-gray-500 hover:text-black font-semibold flex items-center gap-2 transition">
                     View All <i class="fa fa-arrow-right text-xs"></i>
                 </a>
             </div>
@@ -341,7 +342,7 @@ foreach($features_array as $feature) {
                 .then(data => {
                     if (data.includes('No products found') || data.trim() === "") {
                         currentPage--; // પાછા જૂના પેજ પર
-                        alert("તમે છેલ્લી પ્રોડક્ટ પર પહોંચી ગયા છો.");
+                        alert("No more products to display.");
                     } else {
                         container.innerHTML = data;
                         updatePaginationUI();
