@@ -16,7 +16,7 @@ include('db.php');
     <?php include 'header.php'; ?>
 
     <main class="max-w-7xl mx-auto px-6 py-12">
-        <h1 class="text-3xl font-bold text-gray-900 mb-8">તમારી ઇન્ક્વાયરી લિસ્ટ</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Your Inquiry List</h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div class="lg:col-span-2 space-y-4">
@@ -34,9 +34,12 @@ include('db.php');
                     </div>
 
                     <div class="flex items-center border rounded-lg bg-gray-50">
-                        <input type="number" value="<?php echo $qty; ?>"
-                            onchange="updateBulkQty(<?php echo $id; ?>, this.value)"
-                            class="w-20 text-center p-2 bg-transparent font-bold outline-none" min="1">
+
+
+
+                        <input type="number" onchange="updateBulkQty(<?php echo $id; ?>, this.value)"
+                            value="<?php echo $qty; ?>" min="<?php echo $row['min_qty']; ?>"
+                            class="w-16 border rounded-lg p-1 text-center">
                     </div>
 
                     <button onclick="removeFromInquiry(<?php echo $id; ?>)" class="text-red-400 hover:text-red-600">
@@ -55,17 +58,17 @@ include('db.php');
             <div class="bg-white p-8 rounded-3xl shadow-lg border h-fit sticky top-24">
                 <h3 class="text-xl font-bold mb-6">Request Wholesale Quote</h3>
                 <form action="submit_inquiry.php" method="POST" class="space-y-4">
-                    <input type="text" name="name" placeholder="તમારું નામ / કંપનીનું નામ" required
+                    <input type="text" name="name" placeholder="Your Company name" required
                         class="w-full p-3 border rounded-xl bg-gray-50 outline-none focus:ring-2 focus:ring-yellow-500">
-                    <input type="tel" name="phone" placeholder="મોબાઈલ નંબર (WhatsApp)" required
+                    <input type="tel" name="phone" placeholder="Mobile Number" required
                         class="w-full p-3 border rounded-xl bg-gray-50 outline-none focus:ring-2 focus:ring-yellow-500">
-                    <textarea name="message" placeholder="તમારી કોઈ ખાસ જરૂરિયાત જણાવો..."
+                    <textarea name="message" placeholder="Additional Message (optional)"
                         class="w-full p-3 border rounded-xl bg-gray-50 outline-none focus:ring-2 focus:ring-yellow-500"
                         rows="4"></textarea>
 
                     <button type="submit"
                         class="w-full bg-yellow-600 text-white font-bold py-4 rounded-xl hover:bg-black transition-all">
-                        બધી પ્રોડક્ટ્સ માટે ઇન્ક્વાયરી મોકલો
+                        Send Inquiry For All products
                     </button>
                 </form>
             </div>

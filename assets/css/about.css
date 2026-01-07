@@ -12,6 +12,11 @@
     --bg-light: #f8fafc;            /* Soft Gray Background */
 }
 
+body {
+    
+    cursor: pointer;
+}
+
 
 /* 2. Global Helpers */
 .section-padding { padding: 100px 0; }
@@ -126,7 +131,7 @@
 }
 
 /* 5. OUR VALUES SECTION (Exact Design as per Photo) */
-.values-section { background-color: var(--bg-white); }
+.values-section { background-color: #f8fafc; }
 
 .section-title-values {
     font-family: 'Playfair Display', serif;
@@ -210,6 +215,7 @@
     border-radius: 20px;
     border: 1px solid #e2e8f0;
     transition: 0.4s;
+    color: #0e172a;
 }
 .team-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
 .team-card img { width: 100%; height: 400px; object-fit: cover; border-radius: 15px; margin-bottom: 20px; }

@@ -39,10 +39,22 @@ if (!$product) {
                     <img src="uploads/<?php echo $product['image']; ?>" class="w-full h-full object-cover"
                         id="mainImage">
                 </div>
-                <div class="grid grid-cols-4 gap-4">
-                    <div class="border-2 border-yellow-500 rounded-lg p-1 cursor-pointer">
+                <div class="grid grid-cols-4 gap-4 mt-4">
+                    <div class="border rounded-lg p-1 cursor-pointer"
+                        onclick="changeImage('uploads/<?php echo $product['image']; ?>')">
                         <img src="uploads/<?php echo $product['image']; ?>" class="rounded-md">
                     </div>
+
+                    <?php 
+    if(!empty($product['additional_images'])) {
+        $extras = explode(',', $product['additional_images']);
+        foreach($extras as $img) {
+            echo '<div class="border rounded-lg p-1 cursor-pointer" onclick="changeImage(\'uploads/'.trim($img).'\')">
+                    <img src="uploads/'.trim($img).'" class="rounded-md">
+                  </div>';
+        }
+    }
+    ?>
                 </div>
             </div>
 
@@ -64,8 +76,8 @@ if (!$product) {
                 </div>
 
                 <div class="flex items-baseline gap-4 mt-6">
-                    <span class="text-4xl font-bold text-yellow-600">$<?php echo $product['discounted_price']; ?></span>
-                    <span class="text-xl text-gray-400 line-through">$<?php echo $product['original_price']; ?></span>
+                    <span class="text-4xl font-bold text-yellow-600"><?php echo $product['discounted_price']; ?></span>
+                    <span class="text-xl text-gray-400 line-through"><?php echo $product['original_price']; ?></span>
                     <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded">Save
                         <?php echo $product['discount_percent']; ?>%</span>
                 </div>
@@ -73,22 +85,43 @@ if (!$product) {
                 <p class="text-gray-500 mt-6 leading-relaxed">
                     <?php echo $product['short_description']; ?>
                 </p>
-
+                <!-- <div class="flex items-center gap-4">
+                    <div class="flex border rounded-xl overflow-hidden">
+                        <input type="number" id="qty" value="<?php echo $product['min_qty']; ?>"
+                            min="<?php echo $product['min_qty']; ?>" class="w-20 text-center p-2 outline-none">
+                    </div>
+                    <span class="text-red-500 text-sm">Min order: <?php echo $product['min_qty']; ?> units</span>
+                </div> -->
                 <div class="mt-8 flex flex-col gap-4">
                     <div class="flex items-center gap-4">
-                        <div class="flex border rounded-xl overflow-hidden">
+                        <!-- <div class="flex border rounded-xl overflow-hidden">
                             <button class="px-4 py-2 bg-gray-50 hover:bg-gray-200">-</button>
                             <input type="text" value="1" class="w-12 text-center border-x outline-none">
                             <button class="px-4 py-2 bg-gray-50 hover:bg-gray-200">+</button>
-                        </div>
+                        </div> -->
                         <span class="text-gray-400 text-sm">Available: <?php echo $product['available_units']; ?>+
                             units</span>
                     </div>
 
-                    <button
-                        class="w-full bg-yellow-500 text-white font-bold py-4 rounded-full shadow-lg hover:bg-black transition flex items-center justify-center gap-2">
-                        <i class="fa fa-envelope"></i> Send Inquiry
-                    </button>
+
+
+                    <form action="add_to_inquiry.php" method="POST">
+                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+
+                        <div class="flex items-center gap-4 mb-6">
+                            <label class="font-bold">Quantity:</label>
+                            <input type="number" name="qty" value="<?php echo $product['min_qty']; ?>"
+                                min="<?php echo $product['min_qty']; ?>"
+                                class="border p-2 w-20 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none">
+                            <span class="text-red-500 text-sm">Min order: <?php echo $product['min_qty']; ?>
+                                units</span>
+                        </div>
+
+                        <button type="submit" name="add_to_list"
+                            class="bg-black text-white px-8 py-3 rounded-xl font-bold hover:bg-yellow-600 transition">
+                            Add to Inquiry List
+                        </button>
+                    </form>
 
                     <div class="flex gap-4">
                         <button
@@ -128,9 +161,37 @@ if (!$product) {
                 <?php echo nl2br($product['long_description']); ?>
             </div>
         </div>
+
+
+        <section class="mt-20">
+            <h2 class="text-2xl font-bold mb-8">Related Products</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <?php
+        $cat_id = $product['category_id'];
+        $current_id = $product['id'];
+        $related = mysqli_query($conn, "SELECT * FROM products WHERE category_id = '$cat_id' AND id != '$current_id' LIMIT 4");
+        while($r = mysqli_fetch_assoc($related)) {
+        ?>
+                <a href="product-details.php?id=<?php echo $r['id']; ?>" class="group">
+                    <div class="aspect-square bg-gray-100 rounded-2xl overflow-hidden mb-3">
+                        <img src="uploads/<?php echo $r['image']; ?>"
+                            class="w-full h-full object-cover group-hover:scale-105 transition">
+                    </div>
+                    <h3 class="font-bold text-gray-800"><?php echo $r['product_name']; ?></h3>
+                    <p class="text-yellow-600 font-bold">$<?php echo $r['discounted_price']; ?></p>
+                </a>
+                <?php } ?>
+            </div>
+        </section>
     </main>
 
     <?php include 'footer.php'; ?>
+
+    <script>
+    function changeImage(src) {
+        document.getElementById('mainImage').src = src;
+    }
+    </script>
 
 </body>
 

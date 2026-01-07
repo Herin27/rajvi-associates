@@ -33,7 +33,7 @@
 
 <body class="bg-black text-white font-sans">
     <div class="sticky-header">
-        <header
+        <header style="width: 100%; max-width: 1500px;"
             class="flex items-center justify-between px-10 py-4 bg-white/95 backdrop-blur-md text-black max-w-7xl mx-auto rounded-b-2xl shadow-2xl mt-0 border-b border-gray-100">
             <div class="flex items-center gap-3 group cursor-pointer">
                 <div class="w-10 h-10 transition-transform group-hover:rotate-12">
@@ -95,8 +95,8 @@
 
                         <div class="mt-8 pt-6 border-t border-gray-100 flex justify-between items-center">
                             <p class="text-xs text-gray-500 italic">Limited Edition Pieces Available</p>
-                            <a href="#" class="text-xs font-bold text-yellow-600 hover:underline">See All Categories <i
-                                    class="fa fa-arrow-right ml-1 text-[8px]"></i></a>
+                            <a href="category.php" class="text-xs font-bold text-yellow-600 hover:underline">See All
+                                Categories <i class="fa fa-arrow-right ml-1 text-[8px]"></i></a>
                         </div>
                     </div>
                 </div>
@@ -104,6 +104,8 @@
                 <a href="about.php" class="relative hover:text-yellow-600 transition-colors py-4">About</a>
                 <a href="inquiry.php" class="relative hover:text-yellow-600 transition-colors py-4">Inquiry</a>
                 <a href="contact.php" class="relative hover:text-yellow-600 transition-colors py-4">Contact</a>
+                <a href="track-inquiry.php" class="relative hover:text-yellow-600 transition-colors py-4">Track
+                    Inquiry</a>
             </nav>
 
             <div class="flex items-center gap-6">

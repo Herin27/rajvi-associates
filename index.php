@@ -63,6 +63,11 @@ foreach($features_array as $feature) {
             <div id="product-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
                 <?php include('fetch_products.php'); ?>
             </div>
+            <div>
+                <button class="load_product" onclick="loadMoreProducts()">
+                    <a href="category.php">Load More Products</a>
+                </button>
+            </div>
         </section>
 
         <section class="py-16 bg-[#FFFDF5]">
