@@ -14,6 +14,45 @@ foreach($features_array as $feature) {
     <link rel="stylesheet" href="./assets/css/style.css">
     <title>Rajvi Associates - home</title>
 </head>
+<style>
+.load-more-premium {
+    background: #000000;
+    color: #ffffff;
+    padding: 16px 45px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif !important;
+    /* */
+    font-weight: 800;
+    font-size: 14px;
+    /* */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    border: 2px solid #000000;
+}
+
+.load-more-premium:hover {
+    background: #FFB549;
+    /* */
+    color: #000000;
+    border-color: #FFB549;
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px rgba(255, 181, 73, 0.4);
+}
+
+/* મોબાઈલ માટે એડજસ્ટમેન્ટ */
+@media (max-width: 640px) {
+    .load-more-premium {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 20px;
+        font-size: 12px;
+    }
+}
+</style>
 
 <body>
     <!-- <h1>Welcome to Rajvi Associates</h1>
@@ -63,11 +102,66 @@ foreach($features_array as $feature) {
             <div id="product-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
                 <?php include('fetch_products.php'); ?>
             </div>
-            <div>
-                <button class="load_product" onclick="loadMoreProducts()">
-                    <a href="category.php">Load More Products</a>
-                </button>
+            <div class="flex flex-col items-center justify-center mt-12 mb-10 gap-6">
+                <div class="flex items-center gap-8">
+                    <button onclick="slideProducts('prev')" id="prevBtn"
+                        class="nav-btn-circle group disabled:opacity-30" disabled>
+                        <i class="fa fa-chevron-left group-hover:-translate-x-1 transition-transform"></i>
+                    </button>
+
+                    <div id="paginationDots" class="flex gap-2">
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+
+                    <button onclick="slideProducts('next')" id="nextBtn" class="nav-btn-circle group">
+                        <i class="fa fa-chevron-right group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+
+                <a href="category.php" class="load-more-premium shadow-lg shadow-black/5">
+                    View All Collection
+                    <i class="fa fa-arrow-right ml-3 text-xs"></i>
+                </a>
             </div>
+
+            <style>
+            /* Slider Specific Styles */
+            .nav-btn-circle {
+                width: 50px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 50%;
+                color: #111827;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            }
+
+            .nav-btn-circle:hover:not(:disabled) {
+                background: #000;
+                color: #fff;
+                border-color: #000;
+            }
+
+            .dot {
+                width: 8px;
+                height: 8px;
+                background: #d1d5db;
+                border-radius: 50%;
+                transition: all 0.3s ease;
+            }
+
+            .dot.active {
+                background: #000;
+                width: 24px;
+                border-radius: 10px;
+            }
+            </style>
         </section>
 
         <section class="py-16 bg-[#FFFDF5]">
@@ -224,6 +318,53 @@ foreach($features_array as $feature) {
     </main>
 
     <script>
+    let currentPage = 1;
+
+    function slideProducts(direction) {
+        if (direction === 'next') currentPage++;
+        else if (direction === 'prev' && currentPage > 1) currentPage--;
+        else return;
+
+        const container = document.getElementById('product-container');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+
+        // ૧. એનિમેશન આઉટ (Fade out)
+        container.style.opacity = '0';
+        container.style.transform = 'translateX(' + (direction === 'next' ? '-20px' : '20px') + ')';
+        container.style.transition = 'all 0.4s ease';
+
+        setTimeout(() => {
+            // ૨. AJAX દ્વારા ડેટા ખેંચવો
+            fetch(`fetch_products.php?page=${currentPage}`)
+                .then(response => response.text())
+                .then(data => {
+                    if (data.includes('No products found') || data.trim() === "") {
+                        currentPage--; // પાછા જૂના પેજ પર
+                        alert("તમે છેલ્લી પ્રોડક્ટ પર પહોંચી ગયા છો.");
+                    } else {
+                        container.innerHTML = data;
+                        updatePaginationUI();
+                    }
+
+                    // ૩. એનિમેશન ઇન (Fade in)
+                    container.style.opacity = '1';
+                    container.style.transform = 'translateX(0)';
+                });
+        }, 400);
+    }
+
+    function updatePaginationUI() {
+        const prevBtn = document.getElementById('prevBtn');
+        prevBtn.disabled = (currentPage === 1);
+
+        // ડોટ્સ અપડેટ લોજિક
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', (index + 1) === currentPage);
+        });
+    }
+
     function loadProducts(catId) {
         const container = document.getElementById('product-container');
         container.innerHTML = '<div class="col-span-4 text-center py-10">Loading Products...</div>';

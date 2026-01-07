@@ -39,11 +39,14 @@ if(isset($_POST['add_product'])) {
     $query = "INSERT INTO products (category_id, product_name, brand, sku, original_price, discounted_price, discount_percent, min_qty, rating, additional_images, available_units, short_description, long_description, key_features, image) 
               VALUES ('$cat_id', '$name', '$brand', '$sku', '$o_price', '$d_price', '$discount_percent', '$min_qty', '$rating', '$extra_images_str', '$units', '$short_desc', '$long_desc', '$features', '$image')";
     
+
+    
     if(mysqli_query($conn, $query)) {
         echo "<script>alert('Product added successfully with Brand and Rating!'); window.location.href='admin_add_product.php';</script>";
     } else {
         echo "Error: " . mysqli_error($conn);
     }
+
 }
 ?>
 

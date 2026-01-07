@@ -70,7 +70,7 @@
             if(mysqli_num_rows($cat_query) > 0) {
                 while($cat = mysqli_fetch_assoc($cat_query)) {
             ?>
-                            <a href="<?php echo $cat['link']; ?>"
+                            <a href="category.php?id=<?php echo $cat['id']; ?>"
                                 class="group/item flex items-center gap-4 p-2 rounded-xl hover:bg-yellow-50 transition-all">
                                 <div
                                     class="w-14 h-14 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 group-hover/item:border-yellow-300">
@@ -81,7 +81,8 @@
                                 <div>
                                     <h4
                                         class="font-bold text-gray-800 group-hover/item:text-yellow-600 transition-colors">
-                                        <?php echo $cat['name']; ?></h4>
+                                        <?php echo $cat['name']; ?>
+                                    </h4>
                                     <p class="text-[10px] text-gray-400 uppercase tracking-tighter">View Collection</p>
                                 </div>
                             </a>
@@ -95,8 +96,9 @@
 
                         <div class="mt-8 pt-6 border-t border-gray-100 flex justify-between items-center">
                             <p class="text-xs text-gray-500 italic">Limited Edition Pieces Available</p>
-                            <a href="category.php" class="text-xs font-bold text-yellow-600 hover:underline">See All
-                                Categories <i class="fa fa-arrow-right ml-1 text-[8px]"></i></a>
+                            <a href="category.php" class="text-xs font-bold text-yellow-600 hover:underline">
+                                See All Categories <i class="fa fa-arrow-right ml-1 text-[8px]"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
