@@ -120,7 +120,20 @@
 
 
 
-
+                <a href="wishlist.php" class="relative group flex items-center">
+                    <i class="fa-regular fa-heart text-xl text-gray-700 group-hover:text-red-500 transition-colors"></i>
+                    <span id="wishlist-count-badge"
+                        class="absolute -top-2 -right-2 bg-red-600 text-white text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center border border-white">
+                        <?php 
+        include_once 'db.php';
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $w_count_query = mysqli_query($conn, "SELECT id FROM wishlist WHERE ip_address = '$ip'");
+        echo mysqli_num_rows($w_count_query);
+        ?>
+                    </span>
+                </a>
+                </span>
+                </a>
 
                 <div class="relative group/cart flex items-center">
                     <div onclick="window.location.href='cart.php'"

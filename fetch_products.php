@@ -1,17 +1,24 @@
 <?php
 include 'db.php'; 
+$ip = $_SERVER['REMOTE_ADDR']; // યુઝરની ઓળખ માટે
 
-$limit = 4; 
+$limit = 4;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page > 3) { exit; }
 $offset = ($page - 1) * $limit; 
 
-$prod_query = mysqli_query($conn, "SELECT * FROM products LIMIT $limit OFFSET $offset"); 
+$prod_query = mysqli_query($conn, "SELECT * FROM products ORDER BY id DESC LIMIT $limit OFFSET $offset"); 
 
 if(mysqli_num_rows($prod_query) > 0) {
     while($row = mysqli_fetch_assoc($prod_query)) {
-        // ડિસ્કાઉન્ટની ગણતરી અહીં કરો
+        $p_id = $row['id'];
+        
+        // --- વિશલિસ્ટ સ્ટેટસ ચેક કરો ---
+        $wish_check = mysqli_query($conn, "SELECT * FROM wishlist WHERE product_id = '$p_id' AND ip_address = '$ip'");
+        $is_wished = mysqli_num_rows($wish_check) > 0;
+        
         $discount = 0;
-        if($row['original_price'] > $row['discounted_price'] && $row['original_price'] > 0) {
+        if(isset($row['original_price']) && $row['original_price'] > 0) {
             $discount = round((($row['original_price'] - $row['discounted_price']) / $row['original_price']) * 100);
         }
 ?>
@@ -24,10 +31,14 @@ if(mysqli_num_rows($prod_query) > 0) {
             OFF</span>
         <?php endif; ?>
 
-        <button
-            class="absolute top-4 right-4 w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition-all z-10 shadow-sm border border-gray-100">
-            <i class="fa-regular fa-heart"></i>
+        <button onclick="toggleWishlist(<?php echo $p_id; ?>, this)"
+            class="absolute top-4 right-4 w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center transition-all z-10 shadow-sm border border-gray-100">
+            <i class="<?php echo $is_wished ? 'fa-solid text-red-500' : 'fa-regular text-gray-400'; ?> fa-heart"></i>
         </button>
+        <a href="product-details.php?id=<?php echo $p_id; ?>" class="block h-full">
+            <img src="uploads/<?php echo $row['image']; ?>"
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+        </a>
 
         <a href="product-details.php?id=<?php echo $row['id']; ?>" class="block h-full">
             <img src="uploads/<?php echo $row['image']; ?>"
@@ -56,7 +67,7 @@ if(mysqli_num_rows($prod_query) > 0) {
         <div class="flex items-baseline gap-2 mb-4">
             <span
                 class="text-xl font-black text-[#111827]">₹<?php echo number_format($row['discounted_price']); ?></span>
-            <?php if($row['original_price'] > $row['discounted_price']): ?>
+            <?php if(isset($row['original_price']) && $row['original_price'] > $row['discounted_price']): ?>
             <span
                 class="text-xs text-gray-400 line-through font-medium">₹<?php echo number_format($row['original_price']); ?></span>
             <?php endif; ?>

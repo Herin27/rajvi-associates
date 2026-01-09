@@ -66,92 +66,106 @@ foreach($features_array as $feature) {
 
         <?php include('slider.php'); ?>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
         <section class="max-w-7xl mx-auto px-6 py-16">
-            <div class="flex justify-between items-end mb-10">
+            <div class="flex justify-between items-end mb-12">
                 <div>
                     <span
-                        class="bg-black text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Shop
-                        By Sport</span>
-                    <h2 class="text-4xl font-serif font-bold text-gray-900 mt-3">All Categories</h2>
+                        class="bg-black text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em]">Curated
+                        Collections</span>
+                    <h2 class="text-4xl font-black italic tracking-tighter text-gray-900 mt-4 uppercase">All Categories
+                    </h2>
                 </div>
                 <a href="category.php"
-                    class="text-gray-500 hover:text-black font-semibold flex items-center gap-2 transition">
-                    View All <i class="fa fa-arrow-right text-xs"></i>
+                    class="text-gray-400 hover:text-black font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all group">
+                    View All <i
+                        class="fa fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
                 </a>
             </div>
 
-            <div class="flex gap-6 overflow-x-auto pb-8 no-scrollbar">
+            <div class="flex gap-10 overflow-x-auto pb-10 no-scrollbar justify-start md:justify-center">
                 <?php
-    $cat_query = mysqli_query($conn, "SELECT * FROM categories");
-    while($cat = mysqli_fetch_assoc($cat_query)) {
-    ?>
-                <div class="flex flex-col items-center min-w-[120px] group cursor-pointer"
+        $cat_query = mysqli_query($conn, "SELECT * FROM categories");
+        while($cat = mysqli_fetch_assoc($cat_query)) {
+        ?>
+                <div class="flex flex-col items-center min-w-[110px] group cursor-pointer"
                     onclick="loadProducts(<?php echo $cat['id']; ?>)">
+
                     <div
-                        class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center border border-gray-100 group-hover:border-yellow-500 group-hover:shadow-xl transition-all duration-300">
-                        <img src="<?php echo $cat['image_path']; ?>"
-                            class="w-12 h-12 object-contain group-hover:scale-110 transition-transform">
+                        class="relative w-24 h-24 mb-4 rounded-full p-1 border-2 border-transparent group-hover:border-yellow-500 transition-all duration-500">
+                        <div
+                            class="w-full h-full rounded-full overflow-hidden shadow-md group-hover:shadow-2xl group-hover:scale-105 transition-all duration-500 bg-gray-100">
+                            <img src="<?php echo $cat['image_path']; ?>"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                alt="<?php echo $cat['name']; ?>">
+                        </div>
+
+                        <!-- <div
+                            class="absolute -top-1 -right-1 bg-black text-white w-6 h-6 rounded-full flex items-center justify-center scale-0 group-hover:scale-100 transition-transform duration-300 shadow-lg">
+                             <i class="fa fa-plus text-[8px]"></i> 
+                        </div> -->
                     </div>
+
                     <span
-                        class="mt-4 text-xs font-bold uppercase tracking-tighter text-gray-600 group-hover:text-black">
+                        class="text-[11px] font-black uppercase tracking-widest text-gray-500 group-hover:text-black transition-colors duration-300">
                         <?php echo $cat['name']; ?>
                     </span>
                 </div>
                 <?php } ?>
             </div>
-
-            <div id="product-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
-                <?php include('fetch_products.php'); ?>
-            </div>
-            <div class="flex flex-col items-center justify-center mt-12 mb-10 gap-6">
-                <div class="flex items-center gap-8">
+            <section class="max-w-7xl mx-auto px-6 py-16">
+                <div class="relative px-0 lg:px-4">
                     <button onclick="slideProducts('prev')" id="prevBtn"
-                        class="nav-btn-circle group disabled:opacity-30" disabled>
-                        <i class="fa fa-chevron-left group-hover:-translate-x-1 transition-transform"></i>
+                        class="absolute -left-4 lg:-left-16 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white text-black shadow-xl rounded-full flex items-center justify-center border border-gray-100 hover:bg-black hover:text-white transition-all disabled:opacity-0">
+                        <i class="fa fa-chevron-left text-[10px]"></i>
                     </button>
 
-                    <div id="paginationDots" class="flex gap-2">
-                        <span class="dot active"></span>
-                        <span class="dot"></span>
-                        <span class="dot"></span>
+                    <div id="product-container"
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-all duration-500">
+                        <?php include('fetch_products.php'); ?>
                     </div>
 
-                    <button onclick="slideProducts('next')" id="nextBtn" class="nav-btn-circle group">
-                        <i class="fa fa-chevron-right group-hover:translate-x-1 transition-transform"></i>
+                    <button onclick="slideProducts('next')" id="nextBtn"
+                        class="absolute -right-4 lg:-right-16 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white text-black shadow-xl rounded-full flex items-center justify-center border border-gray-100 hover:bg-black hover:text-white transition-all">
+                        <i class="fa fa-chevron-right text-[10px]"></i>
                     </button>
                 </div>
 
-                <a href="category.php" class="load-more-premium shadow-lg shadow-black/5">
-                    View All Collection
-                    <i class="fa fa-arrow-right ml-3 text-xs"></i>
-                </a>
-            </div>
+                <div class="flex flex-col items-center gap-8 mt-12">
+                    <!-- <div id="paginationDots" class="flex justify-center gap-2">
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div> -->
+
+                    <a href="category.php" class="view-all-premium group">
+                        Explore Full Collection
+                        <span
+                            class="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center ml-3 group-hover:bg-yellow-500 group-hover:text-black transition-colors">
+                            <i class="fa fa-arrow-right text-[8px]"></i>
+                        </span>
+                    </a>
+                </div>
+            </section>
 
             <style>
-            /* Slider Specific Styles */
-            .nav-btn-circle {
-                width: 50px;
-                height: 50px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: white;
-                border: 1px solid #e5e7eb;
-                border-radius: 50%;
-                color: #111827;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            }
-
-            .nav-btn-circle:hover:not(:disabled) {
-                background: #000;
-                color: #fff;
-                border-color: #000;
-            }
-
+            /* Clean Minimal Dots */
             .dot {
-                width: 8px;
-                height: 8px;
+                width: 6px;
+                height: 6px;
                 background: #d1d5db;
                 border-radius: 50%;
                 transition: all 0.3s ease;
@@ -159,10 +173,47 @@ foreach($features_array as $feature) {
 
             .dot.active {
                 background: #000;
-                width: 24px;
+                width: 20px;
                 border-radius: 10px;
             }
+
+            /* Premium View All Button Styling */
+            .view-all-premium {
+                display: inline-flex;
+                align-items: center;
+                background: #ffffff;
+                color: #111827;
+                /* */
+                padding: 12px 28px;
+                border-radius: 100px;
+                font-family: 'Inter', sans-serif !important;
+                /* */
+                font-size: 13px;
+                /* */
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                border: 1px solid #e5e7eb;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                text-decoration: none;
+            }
+
+            .view-all-premium:hover {
+                border-color: #000;
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            }
+
+            /* Mobile compatibility for buttons */
+            @media (max-width: 1024px) {
+                .absolute {
+                    display: none;
+                }
+            }
             </style>
+
+
         </section>
 
         <section class="py-16 bg-[#FFFDF5]">
@@ -317,47 +368,71 @@ foreach($features_array as $feature) {
 
     </main>
     </main>
-
     <script>
     let currentPage = 1;
+    const maxPages = 3; // ૧૨ પ્રોડક્ટ્સ માટે ૩ પેજ (૪ પ્રતિ પેજ)
 
     function slideProducts(direction) {
-        if (direction === 'next') currentPage++;
-        else if (direction === 'prev' && currentPage > 1) currentPage--;
-        else return;
+        let nextBtn = document.getElementById('nextBtn');
+        let prevBtn = document.getElementById('prevBtn');
+
+        // પેજ લિમિટ ચેક
+        if (direction === 'next') {
+            if (currentPage < maxPages) {
+                currentPage++;
+            } else {
+                return;
+            }
+        } else if (direction === 'prev' && currentPage > 1) {
+            currentPage--;
+        } else {
+            return;
+        }
 
         const container = document.getElementById('product-container');
-        const nextBtn = document.getElementById('nextBtn');
-        const prevBtn = document.getElementById('prevBtn');
 
-        // ૧. એનિમેશન આઉટ (Fade out)
+        // ૧. એનિમેશન આઉટ
         container.style.opacity = '0';
-        container.style.transform = 'translateX(' + (direction === 'next' ? '-20px' : '20px') + ')';
+        container.style.transform = 'translateY(10px)';
         container.style.transition = 'all 0.4s ease';
 
-        setTimeout(() => {
-            // ૨. AJAX દ્વારા ડેટા ખેંચવો
-            fetch(`fetch_products.php?page=${currentPage}`)
-                .then(response => response.text())
-                .then(data => {
-                    if (data.includes('No products found') || data.trim() === "") {
-                        currentPage--; // પાછા જૂના પેજ પર
-                        alert("No more products to display.");
+        // ૨. AJAX દ્વારા નવી પ્રોડક્ટ્સ મેળવવી
+        fetch(`fetch_products.php?page=${currentPage}`)
+            .then(response => response.text())
+            .then(data => {
+                setTimeout(() => {
+                    if (data.trim() === "") {
+                        // જો ડેટા ખાલી હોય (૧૨ પૂરી થઈ ગઈ હોય)
+                        currentPage--;
+                        updatePaginationUI();
                     } else {
                         container.innerHTML = data;
+                        // ૩. એનિમેશન ઇન
+                        container.style.opacity = '1';
+                        container.style.transform = 'translateY(0)';
                         updatePaginationUI();
                     }
-
-                    // ૩. એનિમેશન ઇન (Fade in)
-                    container.style.opacity = '1';
-                    container.style.transform = 'translateX(0)';
-                });
-        }, 400);
+                }, 300);
+            })
+            .catch(error => console.error('Error:', error));
     }
 
     function updatePaginationUI() {
         const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        // Previous બટન ડિસેબલ લોજિક
         prevBtn.disabled = (currentPage === 1);
+        prevBtn.style.opacity = (currentPage === 1) ? '0' : '1'; // પહેલા પેજ પર Prev છુપાઈ જશે
+
+        // Next બટન ડિસેબલ લોજિક
+        if (currentPage >= maxPages) {
+            nextBtn.disabled = true;
+            nextBtn.classList.add('opacity-30', 'cursor-not-allowed');
+        } else {
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-30', 'cursor-not-allowed');
+        }
 
         // ડોટ્સ અપડેટ લોજિક
         const dots = document.querySelectorAll('.dot');
@@ -366,21 +441,20 @@ foreach($features_array as $feature) {
         });
     }
 
+    // કેટેગરી મુજબ લોડ કરવા માટેનું ફંક્શન
     function loadProducts(catId) {
         const container = document.getElementById('product-container');
-        container.innerHTML = '<div class="col-span-4 text-center py-10">Loading Products...</div>';
+        container.innerHTML = '<div class="col-span-4 text-center py-10 opacity-50">Loading Products...</div>';
 
         fetch('get_products_by_cat.php?category_id=' + catId)
             .then(response => response.text())
             .then(data => {
                 container.innerHTML = data;
             })
-            .catch(error => {
-                console.error('Error:', error);
-                container.innerHTML = 'Products could not be loaded.';
-            });
+            .catch(error => console.error('Error:', error));
     }
 
+    // કાર્ટ ફંક્શનલિટી
     function addToCart(productId) {
         const formData = new FormData();
         formData.append('product_id', productId);
@@ -393,15 +467,59 @@ foreach($features_array as $feature) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // ૧. તરત જ કાર્ટની વિગતો ફરીથી ખેંચો
-                    fetchCartDetails();
-                    // ૨. એલર્ટ બતાવો (Optional: તમે Toast પણ વાપરી શકો)
+                    if (typeof fetchCartDetails === "function") fetchCartDetails();
                     alert('Product added to cart!');
                 } else {
                     alert('Error adding to cart');
                 }
+            });
+    }
+
+    // પેજ લોડ વખતે બટન સ્ટેટ ચેક કરો
+    window.onload = updatePaginationUI;
+
+    function toggleWishlist(productId, element) {
+        const icon = element.querySelector('i');
+        const badge = document.getElementById('wishlist-count-badge');
+
+        // ૧. તરત જ (Instant) આઈકોનનો કલર બદલી નાખો
+        const isAdding = icon.classList.contains('fa-regular');
+
+        if (isAdding) {
+            // હાર્ટ લાલ કરો
+            icon.classList.replace('fa-regular', 'fa-solid');
+            icon.classList.add('text-red-500');
+            icon.classList.replace('text-gray-400', 'text-red-500');
+            // હળવું એનિમેશન આપો
+            element.classList.add('scale-125');
+        } else {
+            // હાર્ટ નોર્મલ કરો
+            icon.classList.replace('fa-solid', 'fa-regular');
+            icon.classList.remove('text-red-500');
+            icon.classList.add('text-gray-400');
+            element.classList.add('scale-90');
+        }
+
+        // ૨. બેકએન્ડમાં ડેટા સેવ કરવા માટે મોકલો
+        const formData = new FormData();
+        formData.append('product_id', productId);
+
+        fetch('toggle_wishlist.php', {
+                method: 'POST',
+                body: formData
             })
-            .catch(error => console.error('Error:', error));
+            .then(response => response.json())
+            .then(data => {
+                // ૩. સર્વર પરથી નવો કાઉન્ટ અપડેટ કરો
+                if (badge && data.count !== undefined) {
+                    badge.innerText = data.count;
+                    badge.classList.add('scale-150');
+                    setTimeout(() => {
+                        badge.classList.remove('scale-150');
+                        element.classList.remove('scale-125', 'scale-90');
+                    }, 200);
+                }
+            });
     }
     </script>
 

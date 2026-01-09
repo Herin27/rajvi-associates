@@ -23,7 +23,7 @@ if(!empty($selected_brands)) {
     $sql .= " AND brand IN ($brand_list)";
 }
 
-// રેટિંગ ફિલ્ટર લોજિક (તમારા ડેટાબેઝમાં rating કોલમ હોવી જોઈએ, અત્યારે 4.5 સ્ટેટિક છે)
+// રેટિંગ ફિલ્ટર લોજિક
 if($rating > 0) {
     $sql .= " AND rating >= $rating";
 }
@@ -334,62 +334,86 @@ $products = mysqli_query($conn, $sql);
 
 
         <div class="flex-1">
-            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3 gap-y-10">
-                <?php while($row = mysqli_fetch_assoc($products)): ?>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <?php while($row = mysqli_fetch_assoc($products)): 
+            $p_id = $row['id'];
+            $ip = $_SERVER['REMOTE_ADDR'];
+            
+            // વિશલિસ્ટ સ્ટેટસ ચેક કરો
+            $wish_check = mysqli_query($conn, "SELECT * FROM wishlist WHERE product_id = '$p_id' AND ip_address = '$ip'");
+            $is_wished = mysqli_num_rows($wish_check) > 0;
+            
+            // ડિસ્કાઉન્ટની ગણતરી
+            $discount = 0;
+            if(isset($row['original_price']) && $row['original_price'] > 0) {
+                $discount = round((($row['original_price'] - $row['discounted_price']) / $row['original_price']) * 100);
+            }
+        ?>
+
                 <div
-                    class="product-card group relative flex flex-col bg-white overflow-hidden transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] rounded-md border border-gray-100 hover:border-gray-200">
-                    <div class="relative aspect-[3/4] bg-[#F7F8F9] overflow-hidden">
-                        <a href="product-details.php?id=<?php echo $row['id']; ?>" class="block h-full">
+                    class="product-card group bg-white overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-500 rounded-2xl flex flex-col relative">
+                    <div class="relative h-72 bg-[#F7F8F9] overflow-hidden">
+
+                        <?php if($discount > 0): ?>
+                        <span
+                            class="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded-sm z-10 shadow-sm">-<?php echo $discount; ?>%
+                            OFF</span>
+                        <?php endif; ?>
+
+                        <button onclick="toggleWishlist(<?php echo $p_id; ?>, this)"
+                            class="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center transition-all z-20 shadow-sm border border-gray-100 hover:scale-110 active:scale-90">
+                            <i
+                                class="<?php echo $is_wished ? 'fa-solid text-red-500' : 'fa-regular text-gray-400'; ?> fa-heart text-xs"></i>
+                        </button>
+
+                        <a href="product-details.php?id=<?php echo $p_id; ?>" class="block h-full">
+                            <img src="uploads/<?php echo $row['image']; ?>"
+                                class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                        </a>
+
+                        <a href="product-details.php?id=<?php echo $p_id; ?>" class="block h-full">
                             <img src="uploads/<?php echo $row['image']; ?>"
                                 class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                 alt="<?php echo $row['product_name']; ?>">
                         </a>
 
                         <div
-                            class="absolute bottom-0 left-0 right-0 bg-black/90 text-white text-center py-3 text-[10px] font-bold uppercase tracking-[0.2em] opacity-0 translate-y-full group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                            View Details
-                        </div>
-
-                        <button onclick="addToInquiry(<?php echo $row['id']; ?>, <?php echo $row['min_qty']; ?>)"
-                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-black px-4 py-2 rounded-full text-[10px] font-black uppercase shadow-2xl opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 z-10 hover:bg-yellow-400">
-                            <i class="fa fa-cart-plus mr-1"></i> Quick Inquiry
-                        </button>
-
-                        <div
-                            class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-sm text-[9px] font-black shadow-sm flex items-center gap-1 border border-gray-100">
-                            <i class="fa fa-star text-black"></i> 4.5
+                            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <a href="product-details.php?id=<?php echo $p_id; ?>"
+                                class="bg-white text-black px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                                View Details
+                            </a>
                         </div>
                     </div>
 
-                    <div class="p-4 flex flex-col flex-grow">
-                        <h4 class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5">
-                            Rajvi Selection
-                        </h4>
-
-                        <h3
-                            class="text-[14px] leading-[20px] text-[#111827] font-semibold mb-3 h-10 overflow-hidden line-clamp-2 group-hover:text-blue-600 transition-colors">
-                            <?php echo $row['product_name']; ?>
-                        </h3>
-
-                        <div class="mt-auto pt-4 border-t border-gray-50">
-                            <div class="flex items-baseline gap-2 mb-3">
-                                <span class="text-lg font-bold text-[#111827]">
-                                    ₹<?php echo number_format($row['discounted_price']); ?>
-                                </span>
-                                <?php if($row['original_price'] > $row['discounted_price']): ?>
-                                <span class="text-[11px] text-gray-400 line-through font-medium">
-                                    ₹<?php echo number_format($row['original_price']); ?>
-                                </span>
-                                <?php endif; ?>
+                    <div class="p-5 flex flex-col flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-[#111827] text-sm truncate max-w-[150px]">
+                                <?php echo $row['product_name']; ?></h4>
+                            <div class="flex text-yellow-400 text-[8px] gap-0.5 mt-1">
+                                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i
+                                    class="fa fa-star"></i><i class="fa fa-star"></i>
                             </div>
+                        </div>
 
-                            <div class="flex items-center justify-between">
-                                <div
-                                    class="bg-blue-50 text-blue-700 text-[9px] font-black px-2 py-1 uppercase rounded-sm tracking-tighter">
-                                    MOQ: <?php echo $row['min_qty']; ?> Units
-                                </div>
-                                <div class="flex gap-2">
-                                </div>
+                        <div class="flex items-baseline gap-2 mb-4">
+                            <span
+                                class="text-xl font-black text-[#111827]">₹<?php echo number_format($row['discounted_price']); ?></span>
+                            <?php if(isset($row['original_price']) && $row['original_price'] > $row['discounted_price']): ?>
+                            <span
+                                class="text-xs text-gray-400 line-through font-medium">₹<?php echo number_format($row['original_price']); ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="mt-auto space-y-2">
+                            <button onclick="addToInquiry(<?php echo $p_id; ?>, <?php echo $row['min_qty']; ?>)"
+                                class="w-full bg-black text-white py-3 rounded-lg font-bold text-[11px] uppercase tracking-widest transition-all hover:bg-gray-800 flex items-center justify-center gap-2">
+                                <i class="fa fa-list-check"></i> Add to Inquiry
+                            </button>
+                            <div class="text-center">
+                                <span
+                                    class="text-[9px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase">MOQ:
+                                    <?php echo $row['min_qty']; ?> Units</span>
                             </div>
                         </div>
                     </div>
@@ -506,6 +530,42 @@ $products = mysqli_query($conn, $sql);
         setTimeout(() => {
             toast.remove();
         }, 3000);
+    }
+
+    function toggleWishlist(productId, element) {
+        const icon = element.querySelector('i');
+        const badge = document.getElementById('wishlist-count-badge');
+
+        // ૧. તરત જ કલર બદલો (Optimistic UI)
+        const isAdding = icon.classList.contains('fa-regular');
+
+        if (isAdding) {
+            icon.className = 'fa-solid fa-heart text-xs text-red-500';
+            element.classList.add('scale-125');
+        } else {
+            icon.className = 'fa-regular fa-heart text-xs text-gray-400';
+            element.classList.add('scale-90');
+        }
+
+        // ૨. સર્વર પર ડેટા મોકલો
+        const formData = new FormData();
+        formData.append('product_id', productId);
+
+        fetch('toggle_wishlist.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (badge && data.count !== undefined) {
+                    badge.innerText = data.count; // હેડર કાઉન્ટ અપડેટ
+                    badge.classList.add('scale-150');
+                    setTimeout(() => {
+                        badge.classList.remove('scale-150');
+                        element.classList.remove('scale-125', 'scale-90');
+                    }, 200);
+                }
+            });
     }
     </script>
 
