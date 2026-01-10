@@ -1,199 +1,114 @@
 <?php
-include('db.php');
+// Database Connection
+$host = "localhost";
+$user = "root";
+$pass = "";
+$dbname = "rajvi-associates";
+$conn = new mysqli($host, $user, $pass, $dbname);
 
-// Delete Category Logic
-if(isset($_GET['delete'])) {
-    $id = $_GET['delete'];
-    $find = mysqli_query($conn, "SELECT image_path FROM categories WHERE id=$id");
-    $data = mysqli_fetch_assoc($find);
-    if(file_exists($data['image_path'])) { unlink($data['image_path']); }
+if (isset($_POST['add_category'])) {
+    $name = mysqli_real_escape_string($conn, $_POST['cat_name']);
+    $parent_id = $_POST['parent_id'] ?? 0;
 
-    mysqli_query($conn, "DELETE FROM categories WHERE id=$id");
-    header("Location: admin_cat.php");
-    exit();
-}
+    // Image Upload Handling
+    $image_path = "";
+    if (!empty($_FILES['cat_image']['name'])) {
+        $file_name = time() . "_" . $_FILES['cat_image']['name'];
+        $target = "uploads/categories/" . $file_name;
+        if (move_uploaded_file($_FILES['cat_image']['tmp_name'], $target)) {
+            $image_path = $target;
+        }
+    }
 
-// Add Category Logic
-if(isset($_POST['add_cat'])) {
-    $name = mysqli_real_escape_string($conn, $_POST['name']);
-    $target_dir = "uploads/categories/";
-    if (!is_dir($target_dir)) { mkdir($target_dir, 0777, true); }
+    $sql = "INSERT INTO categories (name, image_path, parent_id) VALUES ('$name', '$image_path', '$parent_id')";
     
-    $file_name = time() . "_" . basename($_FILES["image"]["name"]);
-    $target_file = $target_dir . $file_name;
-
-    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-        mysqli_query($conn, "INSERT INTO categories (name, image_path) VALUES ('$name', '$target_file')");
-        echo "<script>alert('Category Added Successfully!'); window.location='admin_cat.php';</script>";
+    if ($conn->query($sql)) {
+        header("Location: admin_dashboard.php?success=Category Added");
+    } else {
+        echo "Error: " . $conn->error;
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="gu">
 
 <head>
     <meta charset="UTF-8">
+    <title>Add Category | InquiryHub Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <title>Manage Categories | Luxury Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
-
     body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Inter', sans-serif;
         background-color: #f8fafc;
-    }
-
-    .admin-card {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-    }
-
-    .gradient-btn {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        transition: all 0.3s ease;
-    }
-
-    .gradient-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.3);
     }
     </style>
 </head>
 
-<body class="py-12 px-4">
-
-    <div class="max-w-6xl mx-auto">
-        <div class="flex items-center justify-between mb-10">
-            <div>
-                <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Manage Categories</h1>
-                <p class="text-slate-500 text-sm">Organize your store collections and sports</p>
-            </div>
-            <a href="index.php"
-                class="bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-yellow-600 transition flex items-center gap-2">
-                <i class="fa fa-eye"></i> View Site
+<body class="p-8">
+    <div class="max-w-3xl mx-auto">
+        <div class="flex items-center gap-4 mb-8 border-b pb-6">
+            <a href="admin_dashboard.php"
+                class="bg-white p-2.5 rounded-xl border border-gray-200 text-gray-400 hover:text-blue-600 transition-all shadow-sm">
+                <i class="fas fa-arrow-left"></i>
             </a>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">ADD NEW CATEGORY</h2>
+                <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Organize your product hierarchy</p>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-            <div class="lg:col-span-4">
-                <div class="admin-card p-8 rounded-3xl shadow-xl">
-                    <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                        <i class="fa fa-folder-plus text-yellow-500"></i> New Collection
-                    </h2>
-
-                    <form method="POST" enctype="multipart/form-data" class="space-y-5">
-                        <div>
-                            <label
-                                class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Category
-                                Name</label>
-                            <input type="text" name="name" placeholder="e.g. Running, Rolex"
-                                class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-yellow-500 outline-none transition"
-                                required>
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Icon /
-                                Image</label>
-                            <div class="relative group">
-                                <div
-                                    class="w-full h-40 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center bg-slate-50 group-hover:border-yellow-500 transition cursor-pointer overflow-hidden">
-                                    <div id="upload-placeholder" class="text-center">
-                                        <i class="fa fa-cloud-arrow-up text-slate-300 text-3xl mb-2"></i>
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase">Click to Upload</p>
-                                    </div>
-                                    <img id="preview" class="absolute inset-0 w-full h-full object-cover hidden">
-                                    <input type="file" name="image" class="absolute inset-0 opacity-0 cursor-pointer"
-                                        onchange="previewFile(this)" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button name="add_cat"
-                            class="w-full gradient-btn text-white py-4 rounded-xl font-bold text-sm tracking-widest uppercase">
-                            Add Category
-                        </button>
-                    </form>
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+            <form action="" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Category Name</label>
+                    <input type="text" name="cat_name" required
+                        class="w-full border-2 border-gray-50 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-gray-50/50"
+                        placeholder="e.g. Machinery, Electronics">
                 </div>
-            </div>
 
-            <div class="lg:col-span-8">
-                <div class="admin-card rounded-3xl shadow-xl overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-white/50">
-                        <h3 class="font-bold text-slate-800">Existing Collections</h3>
-                        <span
-                            class="bg-yellow-100 text-yellow-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase">
-                            <?php echo mysqli_num_rows(mysqli_query($conn, "SELECT id FROM categories")); ?> Total
-                        </span>
-                    </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Parent Category
+                        (Optional)</label>
+                    <select name="parent_id"
+                        class="w-full border-2 border-gray-50 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-gray-50/50 cursor-pointer">
+                        <option value="0">None (Main Category)</option>
+                        <?php
+                        $res = $conn->query("SELECT * FROM categories WHERE parent_id = 0");
+                        while($row = $res->fetch_assoc()) {
+                            echo "<option value='".$row['id']."'>".$row['name']."</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50/50">
-                                <tr>
-                                    <th
-                                        class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                        Preview</th>
-                                    <th
-                                        class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                        Name</th>
-                                    <th
-                                        class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">
-                                        Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                <?php
-                                $res = mysqli_query($conn, "SELECT * FROM categories ORDER BY id DESC");
-                                while($cat = mysqli_fetch_assoc($res)) {
-                                ?>
-                                <tr class="hover:bg-slate-50/80 transition">
-                                    <td class="px-6 py-4">
-                                        <div
-                                            class="w-12 h-12 rounded-xl bg-white border border-slate-100 p-2 shadow-sm">
-                                            <img src="<?php echo $cat['image_path']; ?>"
-                                                class="w-full h-full object-contain">
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span
-                                            class="font-bold text-slate-700 text-sm"><?php echo $cat['name']; ?></span>
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <a href="?delete=<?php echo $cat['id']; ?>"
-                                            onclick="return confirm('Are you sure? Products in this category might be affected.')"
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition shadow-sm">
-                                            <i class="fa fa-trash-can text-sm"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Category Icon/Image</label>
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-20 h-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100 flex items-center justify-center text-gray-300">
+                            <i class="far fa-image text-2xl"></i>
+                        </div>
+                        <input type="file" name="cat_image"
+                            class="text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100">
                     </div>
                 </div>
-            </div>
 
+                <div class="pt-4 flex gap-3">
+                    <button type="submit" name="add_category"
+                        class="flex-1 bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all uppercase tracking-widest text-xs">
+                        Create Category
+                    </button>
+                    <a href="admin_dashboard.php"
+                        class="px-8 bg-gray-50 text-gray-400 font-bold py-4 rounded-2xl hover:bg-gray-100 transition-all uppercase tracking-widest text-xs text-center">
+                        Cancel
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
-
-    <script>
-    function previewFile(input) {
-        var file = input.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function() {
-                document.getElementById("preview").src = reader.result;
-                document.getElementById("preview").classList.remove("hidden");
-                document.getElementById("upload-placeholder").classList.add("hidden");
-            }
-            reader.readAsDataURL(file);
-        }
-    }
-    </script>
 </body>
 
 </html>
