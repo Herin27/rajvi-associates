@@ -7,7 +7,7 @@ $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page > 3) { exit; }
 $offset = ($page - 1) * $limit; 
 
-$prod_query = mysqli_query($conn, "SELECT * FROM products ORDER BY id DESC LIMIT $limit OFFSET $offset"); 
+$prod_query = mysqli_query($conn, "SELECT * FROM products WHERE stock_status = 'In Stock' ORDER BY id DESC LIMIT $offset, $limit"); 
 
 if(mysqli_num_rows($prod_query) > 0) {
     while($row = mysqli_fetch_assoc($prod_query)) {

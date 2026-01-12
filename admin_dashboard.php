@@ -444,7 +444,15 @@ $most_inquired_res = $conn->query($most_inquired_query);
                             <td class="px-6 py-5 text-right">
                                 <div
                                     class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-
+                                    <?php 
+        // જો સ્ટેટસ 'In Stock' હોય તો આગળ 'Out of Stock' કરવાનો ઓપ્શન આપવો
+        $next_status = ($p['stock_status'] == 'In Stock') ? 'Out of Stock' : 'In Stock';
+    ?>
+                                    <a href="update_stock_status.php?id=<?php echo $p['id']; ?>&status=<?php echo $next_status; ?>"
+                                        class="<?php echo $statusClass; ?> px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide hover:opacity-75 transition-all cursor-pointer shadow-sm"
+                                        title="Click to mark as <?php echo $next_status; ?>">
+                                        <?php echo $p['stock_status'] ?: 'In Stock'; ?>
+                                    </a>
                                     <a href="admin_edit_product.php?id=<?php echo $p['id']; ?>"
                                         class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                                         title="Edit">
@@ -506,7 +514,6 @@ $most_inquired_res = $conn->query($most_inquired_query);
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <?php 
-        // દરેક કેટેગરી અને તેમાં કેટલી પ્રોડક્ટ્સ છે તે જાણવા માટેની ક્વેરી
         $cat_query = "SELECT c.*, COUNT(p.id) as product_count 
                       FROM categories c 
                       LEFT JOIN products p ON c.id = p.category_id 
@@ -514,12 +521,10 @@ $most_inquired_res = $conn->query($most_inquired_query);
         $cat_res = $conn->query($cat_query);
 
         while($cat = $cat_res->fetch_assoc()): 
-            // સ્ટેટસ બેજ (તમારી ડિઝાઇન મુજબ - Active/Inactive)
-            // અત્યારે આપણે ધારી લઈએ છીએ કે બધી Active છે, તમે ડેટાબેઝ કોલમ મુજબ શરત મૂકી શકો
-            $isActive = true; 
         ?>
-                <div
-                    class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group relative">
+                <div onclick="viewCategoryProducts(<?php echo $cat['id']; ?>, '<?php echo addslashes($cat['name']); ?>')"
+                    class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group relative cursor-pointer">
+
                     <div class="flex items-start justify-between mb-4">
                         <div
                             class="w-12 h-12 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center overflow-hidden">
@@ -530,14 +535,14 @@ $most_inquired_res = $conn->query($most_inquired_query);
                             <?php endif; ?>
                         </div>
 
-                        <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                        <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-all"
+                            onclick="event.stopPropagation();">
                             <a href="admin_edit_category.php?id=<?php echo $cat['id']; ?>"
                                 class="p-1.5 text-gray-400 hover:text-blue-600 transition-colors" title="Edit">
                                 <i class="fas fa-edit text-xs"></i>
                             </a>
-
                             <a href="admin_delete_category.php?id=<?php echo $cat['id']; ?>"
-                                onclick="return confirm('શું તમે ખરેખર આ કેટેગરી ડિલીટ કરવા માંગો છો?')"
+                                onclick="return confirm('Are you sure?')"
                                 class="p-1.5 text-gray-400 hover:text-red-500 transition-colors" title="Delete">
                                 <i class="fas fa-trash text-xs"></i>
                             </a>
@@ -558,6 +563,23 @@ $most_inquired_res = $conn->query($most_inquired_query);
                     </div>
                 </div>
                 <?php endwhile; ?>
+            </div>
+        </div>
+
+        <div id="category-detail-section" class="content-section hidden">
+            <div class="flex items-center gap-4 mb-8">
+                <button onclick="showSection('categories-section')"
+                    class="bg-white p-2.5 rounded-xl border border-gray-200 text-gray-400 hover:text-blue-600 transition-all shadow-sm">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div>
+                    <h2 id="selected-category-name" class="text-2xl font-bold text-gray-800 uppercase tracking-tight">
+                        Category Products</h2>
+                    <p class="text-sm text-gray-500">Products belonging to this category</p>
+                </div>
+            </div>
+
+            <div id="category-products-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             </div>
         </div>
 
@@ -1047,24 +1069,34 @@ $most_inquired_res = $conn->query($most_inquired_query);
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
     function showSection(sectionId) {
+        const targetSection = document.getElementById(sectionId);
+
+        // જો સેક્શન ન મળે તો Error રોકવા માટે
+        if (!targetSection) {
+            console.error("Section not found: " + sectionId);
+            return;
+        }
+
         // 1. બધા સેક્શન્સને છુપાવો
         document.querySelectorAll('.content-section').forEach(section => {
             section.classList.add('hidden');
         });
 
-        // 2. સિલેક્ટ કરેલા સેક્શનને બતાવો
-        document.getElementById(sectionId).classList.remove('hidden');
+        // 2. ટાર્ગેટ સેક્શન બતાવો
+        targetSection.classList.remove('hidden');
 
-        // 3. સાઇડબારની ડિઝાઇન બદલો (Active Link Effect)
+        // 3. સાઇડબાર હાઇલાઇટ અપડેટ કરો
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('bg-blue-600', 'text-white');
             link.classList.add('text-gray-600', 'hover:bg-gray-50');
         });
 
-        // ક્લિક કરેલી લિંકને હાઇલાઇટ કરો
+        // જો સાઇડબારમાં લિંક હોય તો જ હાઇલાઇટ કરો
         const activeLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
-        activeLink.classList.remove('text-gray-600', 'hover:bg-gray-50');
-        activeLink.classList.add('bg-blue-600', 'text-white');
+        if (activeLink) {
+            activeLink.classList.remove('text-gray-600', 'hover:bg-gray-50');
+            activeLink.classList.add('bg-blue-600', 'text-white');
+        }
     }
 
     // HTML ઇનપુટમાં આ ઉમેરો: onkeyup="filterInquiries(this.value)"
@@ -1139,6 +1171,8 @@ $most_inquired_res = $conn->query($most_inquired_query);
         });
     }
 
+
+
     function previewSliderImage(event) {
         var reader = new FileReader();
         reader.onload = function() {
@@ -1161,6 +1195,30 @@ $most_inquired_res = $conn->query($most_inquired_query);
     }
     </script>
     <script>
+    function viewCategoryProducts(catId, catName) {
+        // પહેલા સેક્શન સ્વિચ કરો
+        showSection('category-detail-section');
+        document.getElementById('selected-category-name').innerText = catName;
+
+        // કન્ટેનર મેળવો જ્યાં પ્રોડક્ટ્સ દેખાશે
+        const listContainer = document.getElementById('category-products-list');
+        listContainer.innerHTML =
+            '<div class="col-span-full text-center p-10 text-gray-400 italic">લોડ થઈ રહ્યું છે...</div>';
+
+        // AJAX વિનંતી
+        fetch('get_category_products.php?cat_id=' + catId)
+            .then(response => response.text())
+            .then(data => {
+                // જો ડેટા મળે તો તેને કન્ટેનરમાં મૂકો
+                listContainer.innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                listContainer.innerHTML =
+                    '<p class="p-10 text-red-500 text-center">ડેટા લોડ કરવામાં ભૂલ આવી છે.</p>';
+            });
+    }
+
     function updateStatus(id, status) {
         if (confirm('શું તમે સ્ટેટસ બદલવા માંગો છો?')) {
             // અહીં તમે AJAX વાપરી શકો અથવા સાદું ફોર્મ સબમિટ કરી શકો

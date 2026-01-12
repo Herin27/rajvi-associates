@@ -1,14 +1,18 @@
 <?php
-include 'db.php'; // ડેટાબેઝ કનેક્શન
+include 'db.php';
 
 // AJAX દ્વારા મોકલેલી Category ID મેળવો
-$cat_id = isset($_GET['category_id']) ? $_GET['category_id'] : 0;
+$cat_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : 0;
 
-// જો cat_id હોય તો તે કેટેગરીની પ્રોડક્ટ્સ લો, નહીંતર બધી બતાવો
-$query = "SELECT * FROM products";
+// ૧. બેઝ ક્વેરી તૈયાર કરો (ફક્ત In Stock પ્રોડક્ટ્સ જ બતાવવા માટે)
+$query = "SELECT * FROM products WHERE stock_status = 'In Stock'";
+
+// ૨. જો ચોક્કસ કેટેગરી ફિલ્ટર હોય
 if($cat_id > 0) {
-    $query .= " WHERE category_id = '$cat_id'";
+    $query .= " AND category_id = $cat_id";
 }
+
+// ૩. છેલ્લે એક જ વાર ORDER BY ઉમેરો
 $query .= " ORDER BY id DESC";
 
 $res = mysqli_query($conn, $query);
@@ -29,7 +33,7 @@ if(mysqli_num_rows($res) > 0) {
             class="absolute top-4 left-4 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-lg z-10">-<?php echo $discount; ?>%</span>
         <?php endif; ?>
 
-        <button
+        <button onclick="toggleWishlist(<?php echo $row['id']; ?>, this)"
             class="absolute top-4 right-4 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition z-10 shadow-sm">
             <i class="fa-regular fa-heart"></i>
         </button>
@@ -49,7 +53,6 @@ if(mysqli_num_rows($res) > 0) {
 
     <div class="p-5">
         <h4 class="font-bold text-gray-800 mb-1 truncate"><?php echo $row['product_name']; ?></h4>
-
         <div class="flex items-center gap-2 mb-3">
             <div class="flex text-yellow-400 text-[10px]">
                 <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i
@@ -57,20 +60,17 @@ if(mysqli_num_rows($res) > 0) {
             </div>
             <span class="text-[10px] text-gray-400 font-bold">New Arrival</span>
         </div>
-
         <div class="flex items-baseline gap-2 mb-5">
-            <span class="text-xl font-bold text-black">$<?php echo $row['discounted_price']; ?></span>
+            <span class="text-xl font-bold text-black">₹<?php echo $row['discounted_price']; ?></span>
             <?php if(isset($row['original_price']) && $row['original_price'] > $row['discounted_price']): ?>
-            <span class="text-sm text-gray-400 line-through">$<?php echo $row['original_price']; ?></span>
+            <span class="text-sm text-gray-400 line-through">₹<?php echo $row['original_price']; ?></span>
             <?php endif; ?>
         </div>
-
         <div class="flex flex-col gap-2 mb-5">
             <button onclick="addToCart(<?php echo $row['id']; ?>)"
                 class="w-full bg-black hover:bg-yellow-600 text-white py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 group/btn">
                 <i class="fa fa-shopping-cart"></i> Add to Cart
             </button>
-
             <button onclick="addToInquiry(<?php echo $row['id']; ?>)"
                 class="w-full bg-black hover:bg-yellow-600 text-white py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 group/btn">
                 <i class="fa fa-list-plus"></i> Add to Inquiry
@@ -81,49 +81,10 @@ if(mysqli_num_rows($res) > 0) {
 <?php
     }
 } else {
-    echo "<div class='col-span-4 text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-100'>
+    // જો કોઈ પ્રોડક્ટ ન મળે અથવા બધી Out of Stock હોય તો આ મેસેજ દેખાશે
+    echo "<div class='col-span-full text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-100'>
             <i class='fa fa-box-open text-gray-300 text-5xl mb-4'></i>
-            <p class='text-gray-500 font-medium'>આ કેટેગરીમાં હાલમાં કોઈ પ્રોડક્ટ ઉપલબ્ધ નથી.</p>
+            <p class='text-gray-500 font-medium'>No products available in this category.</p>
           </div>";
 }
 ?>
-
-<script>
-function addToCart(productId) {
-    // બટન એનિમેશન અથવા લોડિંગ બતાવવા માટે (Optional)
-    console.log("Adding product " + productId + " to cart...");
-
-    // FormData તૈયાર કરો
-    const formData = new FormData();
-    formData.append('product_id', productId);
-    formData.append('quantity', 1);
-
-    // Fetch API નો ઉપયોગ કરીને PHP ફાઇલ પર ડેટા મોકલો
-    fetch('add_to_cart_process.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('પ્રોડક્ટ કાર્ટમાં ઉમેરાઈ ગઈ છે!');
-                // અહીં તમે હેડરમાં રહેલા કાર્ટ કાઉન્ટને પણ અપડેટ કરી શકો છો
-                updateCartCount(data.new_count);
-            } else {
-                alert('કાર્ટમાં ઉમેરવામાં સમસ્યા આવી.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('કંઈક ભૂલ થઈ છે.');
-        });
-}
-
-// કાર્ટ કાઉન્ટ અપડેટ કરવા માટેનું ફંક્શન
-function updateCartCount(count) {
-    const cartBadge = document.getElementById('cart-count-badge');
-    if (cartBadge) {
-        cartBadge.innerText = count;
-    }
-}
-</script>
