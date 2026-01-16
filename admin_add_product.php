@@ -19,7 +19,11 @@ if(isset($_POST['add_product'])) {
     $long_desc = mysqli_real_escape_string($conn, $_POST['long_desc']);
     $features = mysqli_real_escape_string($conn, $_POST['features']);
     $min_qty = $_POST['min_qty'];
-    $extra_details = isset($_POST['extra']) ? json_encode($_POST['extra']) : NULL;
+    $brochure_name = NULL;
+
+    // મહત્વનો સુધારો: ખાલી વેલ્યુને બદલે '{}' મોકલો અને તેને Escape કરો
+    $extra_json = (isset($_POST['extra']) && !empty($_POST['extra'])) ? json_encode($_POST['extra']) : '{}';
+    $extra_details = mysqli_real_escape_string($conn, $extra_json);
 
     // Additional Images Handling
     $additional_images = [];
@@ -27,10 +31,15 @@ if(isset($_POST['add_product'])) {
         foreach($_FILES['extra_images']['tmp_name'] as $key => $tmp_name) {
             if(!empty($tmp_name)) {
                 $file_name = time() . "_" . $_FILES['extra_images']['name'][$key];
-                move_uploaded_file($tmp_name, "uploads/" . $file_name);
+                // આ લાઇન ચેક કરો, તેમાં છેલ્લે '/' હોવો જોઈએ
+move_uploaded_file($_FILES['brochure']['tmp_name'], "uploads/pdf/" . $brochure_name);
                 $additional_images[] = $file_name;
             }
         }
+    }
+    if(isset($_FILES['brochure']['name']) && !empty($_FILES['brochure']['name'])) {
+    $brochure_name = "brochure_" . time() . "_" . $_FILES['brochure']['name'];
+    move_uploaded_file($_FILES['brochure']['tmp_name'], "uploads/pdf/" . $brochure_name);
     }
     $extra_images_str = implode(',', $additional_images);
     
@@ -41,11 +50,15 @@ if(isset($_POST['add_product'])) {
     $image = time() . "_" . $_FILES['pimage']['name'];
     move_uploaded_file($_FILES['pimage']['tmp_name'], "uploads/" . $image);
 
-    $query = "INSERT INTO products (category_id, product_name, brand, sku, original_price, discounted_price, discount_percent, min_qty, rating, additional_images, available_units, short_description, long_description, key_features, category_details, image) 
-              VALUES ('$cat_id', '$name', '$brand', '$sku', '$o_price', '$d_price', '$discount_percent', '$min_qty', '$rating', '$extra_images_str', '$units', '$short_desc', '$long_desc', '$features', '$extra_details', '$image')";
+    // ક્વેરીમાં $extra_details વાપર્યું છે જે હવે ક્યારેય ખાલી નહીં હોય
+    $query = "INSERT INTO products (category_id, product_name, brand, sku, original_price, discounted_price, discount_percent, min_qty, rating, additional_images, available_units, short_description, long_description, key_features, category_details, image,brochure_pdf) 
+              VALUES ('$cat_id', '$name', '$brand', '$sku', '$o_price', '$d_price', '$discount_percent', '$min_qty', '$rating', '$extra_images_str', '$units', '$short_desc', '$long_desc', '$features', '$extra_details', '$image','$brochure_name')";
 
     if(mysqli_query($conn, $query)) {
         echo "<script>alert('Product added successfully!'); window.location.href='admin_dashboard.php';</script>";
+    } else {
+        // જો હજી પણ Error આવે તો તેને જોવા માટે:
+        die("Error: " . mysqli_error($conn));
     }
 }
 ?>
@@ -82,7 +95,6 @@ if(isset($_POST['add_product'])) {
         </div>
 
         <form action="" method="POST" enctype="multipart/form-data" class="grid grid-cols-3 gap-8">
-
             <div class="col-span-2 space-y-6">
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
                     <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-6">Product Details</h3>
@@ -91,26 +103,19 @@ if(isset($_POST['add_product'])) {
                             <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Product Name</label>
                             <input type="text" name="pname"
                                 class="w-full border-2 border-gray-50 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-gray-50/50"
-                                placeholder="e.g. Forclaz Trekking Jacket" required>
+                                placeholder="e.g. Luxury Perfume" required>
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Brand Name</label>
                             <input type="text" name="brand"
                                 class="w-full border-2 border-gray-50 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-gray-50/50"
-                                placeholder="e.g. FORCLAZ" required>
+                                placeholder="e.g. Rajvi" required>
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-500 mb-2">SKU Code</label>
                             <input type="text" name="sku"
                                 class="w-full border-2 border-gray-50 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-gray-50/50"
                                 placeholder="PSS-001">
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Key Features (Commas
-                                separated)</label>
-                            <input type="text" name="features"
-                                class="w-full border-2 border-gray-50 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-gray-50/50"
-                                placeholder="Waterproof, Lightweight, 2-Year Warranty">
                         </div>
                         <div class="col-span-2">
                             <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Short Intro
@@ -139,7 +144,7 @@ if(isset($_POST['add_product'])) {
                                 required>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Discount (₹)</label>
+                            <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Discounted (₹)</label>
                             <input type="number" name="d_price"
                                 class="w-full border-2 border-gray-50 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-gray-50/50"
                                 required>
@@ -159,7 +164,7 @@ if(isset($_POST['add_product'])) {
                                 (Units)</label>
                             <input type="number" name="units"
                                 class="w-full border-2 border-gray-50 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-gray-50/50"
-                                placeholder="e.g. 500">
+                                placeholder="e.g. 100">
                         </div>
                     </div>
                 </div>
@@ -170,7 +175,8 @@ if(isset($_POST['add_product'])) {
                     <label class="block text-xs font-bold uppercase text-gray-500 mb-4 tracking-widest">Select
                         Category</label>
                     <select name="category_id" onchange="showDynamicFields(this.value)"
-                        class="w-full border-2 border-gray-50 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-gray-50/50 cursor-pointer">
+                        class="w-full border-2 border-gray-50 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-gray-50/50 cursor-pointer"
+                        required>
                         <option value="">Choose Category</option>
                         <?php
                         $cats = mysqli_query($conn, "SELECT * FROM categories");
@@ -196,6 +202,13 @@ if(isset($_POST['add_product'])) {
                             class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer"
                             multiple>
                     </div>
+                    <div class="mt-6 border-t pt-6">
+                        <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Product Brochure
+                            (PDF)</label>
+                        <input type="file" name="brochure" accept=".pdf"
+                            class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-orange-600 file:text-white hover:file:bg-orange-700 cursor-pointer">
+                        <p class="text-[9px] text-gray-400 mt-2 italic">*Only PDF files are allowed</p>
+                    </div>
                 </div>
 
                 <button type="submit" name="add_product"
@@ -203,7 +216,6 @@ if(isset($_POST['add_product'])) {
                     Publish to Website
                 </button>
             </div>
-
         </form>
     </div>
 
@@ -220,6 +232,23 @@ if(isset($_POST['add_product'])) {
                     <input type="text" name="extra[scent_features]" class="w-full border border-blue-100 p-2 text-sm rounded-lg outline-none" placeholder="Features (e.g. Long-lasting)">
                 </div>
             `;
+        } else if (catId == "4") { // Health Care ID (તમારી સાચી ID અહીં લખો)
+            container.classList.remove('hidden');
+            container.innerHTML = `
+            <h3 class="text-[10px] font-black uppercase text-green-600 mb-3 tracking-tighter italic">Health Care Details</h3>
+            <div class="space-y-4">
+                <select name="extra[item_form]" class="w-full border border-green-100 p-2 text-sm rounded-lg outline-none" required>
+                    <option value="">Select Item Form</option>
+                    <option value="Tablet">Paste</option>
+                    <option value="Capsule">Capsule</option>
+                    <option value="Syrup">Syrup</option>
+                    <option value="Powder">Powder</option>
+                    <option value="Gel">Gel</option>
+                </select>
+                <input type="text" name="extra[flavour]" class="w-full border border-green-100 p-2 text-sm rounded-lg outline-none" placeholder="Flavour (e.g. Orange, Mint, Unflavoured)" required>
+                
+            </div>
+        `;
         } else {
             container.classList.add('hidden');
             container.innerHTML = "";

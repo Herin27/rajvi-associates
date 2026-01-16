@@ -1,3 +1,9 @@
+<style>
+.footer-bottom a {
+    color: #f5d179;
+}
+</style>
+
 <footer class="bg-[#0B121C] text-white pt-16 pb-6">
     <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 pb-12">
 
@@ -87,7 +93,7 @@
     </div>
 
     <div class="pt-8 text-center text-gray-500 text-xs tracking-wide">
-        <p>© 2026 Luxury Store Powerd By <span><a style="text-decoration: none;"
+        <p>© 2026 Luxury Store Powerd By <span><a style="text-decoration: none; color: #fff;"
                     href="https://www.veloxgroup.co.in/">Velox Group</a></span>. All rights reserved.</p>
     </div>
 </footer>

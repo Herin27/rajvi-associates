@@ -36,8 +36,8 @@ if(mysqli_num_rows($prod_query) > 0) {
             <i class="<?php echo $is_wished ? 'fa-solid text-red-500' : 'fa-regular text-gray-400'; ?> fa-heart"></i>
         </button>
         <a href="product-details.php?id=<?php echo $p_id; ?>" class="block h-full">
-            <img src="uploads/<?php echo $row['image']; ?>"
-                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+            <img src="uploads/<?php echo $row['image']; ?>" style="width: 100%; height: 100%; object-fit: contain;"
+                class="transition-transform duration-700 group-hover:scale-110">
         </a>
 
         <a href="product-details.php?id=<?php echo $row['id']; ?>" class="block h-full">

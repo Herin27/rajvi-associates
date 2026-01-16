@@ -11,15 +11,19 @@ if (isset($_POST['product_id'])) {
         $_SESSION['cart'] = [];
     }
 
+    // પ્રોડક્ટ એડ અથવા અપડેટ કરો
     if (isset($_SESSION['cart'][$p_id])) {
         $_SESSION['cart'][$p_id] += $qty;
     } else {
         $_SESSION['cart'][$p_id] = $qty;
     }
 
+    // યુનિક પ્રોડક્ટ્સની સંખ્યા ગણવા માટે count() વાપરો (array_sum નહીં)
+    $new_count = count($_SESSION['cart']); 
+
     echo json_encode([
         'success' => true,
-        'new_count' => array_sum($_SESSION['cart'])
+        'new_count' => $new_count
     ]);
 } else {
     echo json_encode(['success' => false]);

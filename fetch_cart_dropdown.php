@@ -13,7 +13,6 @@ $response = [
 ];
 
 $total_price = 0;
-$total_count = 0;
 $cart_html = "";
 
 if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
@@ -25,7 +24,6 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
             $price = (float)$row['discounted_price'];
             $subtotal = $price * $qty;
             $total_price += $subtotal;
-            $total_count += $qty;
 
             $cart_html .= '
             <div class="flex items-center gap-3 border-b border-gray-50 pb-2">
@@ -39,11 +37,15 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
             </div>';
         }
     }
+    
+    // મહત્વનો ફેરફાર અહીં છે:
     $response['html'] = $cart_html;
     $response['total'] = number_format($total_price, 2);
-    $response['count'] = $total_count;
+    $response['count'] = count($_SESSION['cart']); // ફક્ત યુનિક પ્રોડક્ટ્સની સંખ્યા
+    
 } else {
     $response['html'] = '<p class="text-xs text-gray-400 text-center py-4 italic">Your bag is empty.</p>';
+    $response['count'] = 0;
 }
 
 echo json_encode($response);

@@ -144,12 +144,6 @@ foreach($features_array as $feature) {
                 </div>
 
                 <div class="flex flex-col items-center gap-8 mt-12">
-                    <!-- <div id="paginationDots" class="flex justify-center gap-2">
-                        <span class="dot active"></span>
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                    </div> -->
 
                     <a href="category.php" class="view-all-premium group">
                         Explore Full Collection

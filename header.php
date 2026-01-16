@@ -144,7 +144,7 @@
                                 class="fa-solid fa-basket-shopping text-gray-800 text-xl group-hover/cart:text-yellow-600 transition-colors"></i>
                             <span id="cart-count-badge"
                                 class="absolute -top-2 -right-2 bg-black text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-md">
-                                <?php echo isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : '0'; ?>
+                                <?php echo (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) ? count($_SESSION['cart']) : '0'; ?>
                             </span>
                         </div>
 

@@ -34,13 +34,21 @@ if(isset($_POST['update_product'])) {
         $image = $data['image'];
     }
 
-    $update_query = "UPDATE products SET 
-        category_id='$cat_id', product_name='$name', brand='$brand', sku='$sku', 
-        original_price='$o_price', discounted_price='$d_price', 
-        discount_percent='$discount_percent', min_qty='$min_qty', rating='$rating', 
-        available_units='$units', short_description='$short_desc', 
-        long_description='$long_desc', key_features='$features', 
-        image='$image' WHERE id='$id'";
+   // --- નવો PDF અપડેટ લોજિક ઉમેરો ---
+$brochure_pdf = $data['brochure_pdf']; // જૂની ફાઇલનું નામ ડિફોલ્ટ રાખો
+if(!empty($_FILES['brochure']['name'])) {
+    $brochure_pdf = "brochure_" . time() . "_" . $_FILES['brochure']['name'];
+    move_uploaded_file($_FILES['brochure']['tmp_name'], "uploads/pdf/" . $brochure_pdf);
+}
+
+// ક્વેરીમાં brochure_pdf = '$brochure_pdf' ઉમેરો
+$update_query = "UPDATE products SET 
+    category_id='$cat_id', product_name='$name', brand='$brand', sku='$sku', 
+    original_price='$o_price', discounted_price='$d_price', 
+    discount_percent='$discount_percent', min_qty='$min_qty', rating='$rating', 
+    available_units='$units', short_description='$short_desc', 
+    long_description='$long_desc', key_features='$features', 
+    image='$image', brochure_pdf='$brochure_pdf' WHERE id='$id'";
 
     if(mysqli_query($conn, $update_query)) {
         header("Location: admin_dashboard.php?success=1"); // ડેશબોર્ડ પર પાછા જાઓ
@@ -182,6 +190,15 @@ if(isset($_POST['update_product'])) {
                         <input type="file" name="pimage"
                             class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
                         <input type="hidden" name="min_qty" value="<?php echo $data['min_qty']; ?>">
+                    </div>
+                    <div class="mt-4 w-full">
+                        <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Update Brochure
+                            (PDF)</label>
+                        <input type="file" name="brochure" accept=".pdf"
+                            class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-red-600 file:text-white hover:file:bg-red-700 cursor-pointer">
+                        <?php if(!empty($data['brochure_pdf'])): ?>
+                        <p class="text-[10px] text-green-600 mt-1">Current PDF: <?php echo $data['brochure_pdf']; ?></p>
+                        <?php endif; ?>
                     </div>
                 </div>
 

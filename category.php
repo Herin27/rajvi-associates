@@ -1,31 +1,36 @@
 <?php
 include 'db.php';
 
+// જૂના વેરીએબલ્સ
 $min_p = isset($_GET['min_price']) ? $_GET['min_price'] : 0;
 $max_p = isset($_GET['max_price']) ? $_GET['max_price'] : 100000;
 $cat_id = isset($_GET['id']) ? $_GET['id'] : 0;
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'latest';
-
-// નવા ફિલ્ટર્સના ડેટા
 $selected_brands = isset($_GET['brands']) ? $_GET['brands'] : [];
 $rating = isset($_GET['rating']) ? $_GET['rating'] : 0;
 
-// બેઝ ક્વેરી
+// નવું સ્ટોક ફિલ્ટર વેરીએબલ (Default: 'In Stock' પ્રોડક્ટ્સ જ બતાવો)
+$stock_status = isset($_GET['stock_status']) ? $_GET['stock_status'] : 'In Stock';
+
+// બેઝ ક્વેરી - જ્યાં stock_status ફિલ્ટર ઉમેર્યું છે
 $sql = "SELECT * FROM products WHERE discounted_price BETWEEN $min_p AND $max_p";
+
+// સ્ટોક ફિલ્ટર લોજિક
+if($stock_status != 'All') {
+    $sql .= " AND stock_status = '$stock_status'";
+}
 
 if($cat_id > 0) {
     $sql .= " AND category_id = '$cat_id'";
 }
 
-// બ્રાન્ડ ફિલ્ટર લોજિક
 if(!empty($selected_brands)) {
-    $brand_list = "'" . implode("','", array_map(fn($b) => mysqli_real_escape_string($conn, $b), $selected_brands)) . "'";
+    // એરેને ક્વોટ્સ સાથે સ્ટ્રિંગમાં ફેરવો (દા.ત. 'Apple','Samsung')
+    $brand_list = "'" . implode("','", array_map(function($b) use ($conn) {
+        return mysqli_real_escape_string($conn, $b);
+    }, $selected_brands)) . "'";
+    
     $sql .= " AND brand IN ($brand_list)";
-}
-
-// રેટિંગ ફિલ્ટર લોજિક
-if($rating > 0) {
-    $sql .= " AND rating >= $rating";
 }
 
 // સોર્ટિંગ લોજિક
@@ -154,35 +159,6 @@ $products = mysqli_query($conn, $sql);
             </div>
         </div>
     </div>
-    <!-- <div class="mt-6">
-        <h3 class="font-bold text-[10px] uppercase tracking-widest text-gray-400 mb-3 text-center">Popular Price Range
-        </h3>
-        <div class="grid grid-cols-1 gap-2">
-            <button type="button" onclick="setPriceBracket(0, 1000)"
-                class="text-xs font-bold border border-gray-200 py-2 px-3 rounded-lg hover:bg-black hover:text-white hover:border-black transition-all text-left flex justify-between items-center group">
-                ₹1,000 ની નીચે
-                <i class="fa fa-chevron-right text-[8px] opacity-0 group-hover:opacity-100 transition-all"></i>
-            </button>
-
-            <button type="button" onclick="setPriceBracket(1000, 5000)"
-                class="text-xs font-bold border border-gray-200 py-2 px-3 rounded-lg hover:bg-black hover:text-white hover:border-black transition-all text-left flex justify-between items-center group">
-                ₹1,000 - ₹5,000
-                <i class="fa fa-chevron-right text-[8px] opacity-0 group-hover:opacity-100 transition-all"></i>
-            </button>
-
-            <button type="button" onclick="setPriceBracket(5000, 15000)"
-                class="text-xs font-bold border border-gray-200 py-2 px-3 rounded-lg hover:bg-black hover:text-white hover:border-black transition-all text-left flex justify-between items-center group">
-                ₹5,000 - ₹15,000
-                <i class="fa fa-chevron-right text-[8px] opacity-0 group-hover:opacity-100 transition-all"></i>
-            </button>
-
-            <button type="button" onclick="setPriceBracket(15000, 100000)"
-                class="text-xs font-bold border border-gray-200 py-2 px-3 rounded-lg hover:bg-black hover:text-white hover:border-black transition-all text-left flex justify-between items-center group">
-                ₹15,000 થી ઉપર
-                <i class="fa fa-chevron-right text-[8px] opacity-0 group-hover:opacity-100 transition-all"></i>
-            </button>
-        </div>
-    </div> -->
 
     <div class="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
         <button onclick="toggleFilter()"
@@ -291,6 +267,29 @@ $products = mysqli_query($conn, $sql);
                         <?php endwhile; ?>
                     </div>
                 </div>
+                <div class="mb-8 border-t pt-6">
+                    <h3 class="font-bold text-xs uppercase tracking-widest mb-4 text-gray-400">Availability</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="stock_status" value="In Stock" onchange="this.form.submit()"
+                                <?php if($stock_status == 'In Stock') echo 'checked'; ?> class="w-4 h-4 accent-black">
+                            <span class="text-sm font-medium text-gray-600 group-hover:text-black">In Stock Only</span>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="stock_status" value="Out of Stock" onchange="this.form.submit()"
+                                <?php if($stock_status == 'Out of Stock') echo 'checked'; ?>
+                                class="w-4 h-4 accent-black">
+                            <span class="text-sm font-medium text-gray-600 group-hover:text-black">Out of Stock</span>
+                        </label>
+
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="stock_status" value="All" onchange="this.form.submit()"
+                                <?php if($stock_status == 'All') echo 'checked'; ?> class="w-4 h-4 accent-black">
+                            <span class="text-sm font-medium text-gray-600 group-hover:text-black">Show All</span>
+                        </label>
+                    </div>
+                </div>
 
                 <div class="mb-8 border-t pt-6">
                     <h3 class="font-bold text-xs uppercase tracking-widest mb-4 text-gray-400">Ratings</h3>
@@ -352,7 +351,7 @@ $products = mysqli_query($conn, $sql);
 
                 <div
                     class="product-card group bg-white overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-500 rounded-2xl flex flex-col relative">
-                    <div class="relative h-72 bg-[#F7F8F9] overflow-hidden">
+                    <div class="relative h-72 bg-[#F7F8F9] overflow-hidden flex items-center justify-center">
 
                         <?php if($discount > 0): ?>
                         <span
@@ -368,14 +367,15 @@ $products = mysqli_query($conn, $sql);
 
                         <a href="product-details.php?id=<?php echo $p_id; ?>" class="block h-full">
                             <img src="uploads/<?php echo $row['image']; ?>"
-                                class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                                style="width: 100%; height: 100%; object-fit: contain;"
+                                class="transition-transform duration-700 group-hover:scale-110">
                         </a>
 
-                        <a href="product-details.php?id=<?php echo $p_id; ?>" class="block h-full">
+                        <!-- <a href="product-details.php?id=<?php echo $p_id; ?>" class="block h-full">
                             <img src="uploads/<?php echo $row['image']; ?>"
                                 class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                 alt="<?php echo $row['product_name']; ?>">
-                        </a>
+                        </a> -->
 
                         <div
                             class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
