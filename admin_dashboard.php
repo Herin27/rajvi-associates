@@ -924,6 +924,8 @@ $most_inquired_res = $conn->query($most_inquired_query);
                                 </tbody>
                             </table>
                         </div>
+
+
                     </div>
                 </div>
             </div>
@@ -1058,6 +1060,52 @@ $most_inquired_res = $conn->query($most_inquired_query);
                         </button>
                     </form>
                 </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mt-8">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-6">Display Controls (On/Off)
+                    </h3>
+                    <div class="space-y-6">
+                        <?php
+        $settings_res = $conn->query("SELECT * FROM site_settings");
+        while($setting = $settings_res->fetch_assoc()):
+        ?>
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                            <div>
+                                <p class="font-bold text-gray-800 capitalize">
+                                    <?php echo str_replace('_', ' ', $setting['feature_key']); ?></p>
+                                <p class="text-xs text-gray-400">Toggle to show/hide this element for users.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer"
+                                    <?php echo $setting['is_enabled'] ? 'checked' : ''; ?>
+                                    onchange="updateUIFeature('<?php echo $setting['feature_key']; ?>', this.checked)">
+                                <div
+                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                                </div>
+                            </label>
+                        </div>
+                        <?php endwhile; ?>
+                    </div>
+                </div>
+
+                <script>
+                function updateUIFeature(key, status) {
+                    const isEnabled = status ? 1 : 0;
+                    fetch('update_ui_settings.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `key=${key}&status=${isEnabled}`
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                console.log(key + " updated to " + isEnabled);
+                            }
+                        });
+                }
+                </script>
 
 
             </div>

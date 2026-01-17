@@ -51,7 +51,7 @@
 
                 <div class="group static md:relative">
                     <button class="flex items-center gap-1 hover:text-yellow-600 transition-colors py-4">
-                        Categories <i
+                        All Categories <i
                             class="fa fa-chevron-down text-[10px] group-hover:rotate-180 transition-transform"></i>
                     </button>
 

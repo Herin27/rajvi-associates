@@ -25,21 +25,27 @@ if(isset($_POST['add_product'])) {
     $extra_json = (isset($_POST['extra']) && !empty($_POST['extra'])) ? json_encode($_POST['extra']) : '{}';
     $extra_details = mysqli_real_escape_string($conn, $extra_json);
 
-    // Additional Images Handling
+   // Additional Images Handling
     $additional_images = [];
     if(isset($_FILES['extra_images'])) {
         foreach($_FILES['extra_images']['tmp_name'] as $key => $tmp_name) {
             if(!empty($tmp_name)) {
-                $file_name = time() . "_" . $_FILES['extra_images']['name'][$key];
-                // આ લાઇન ચેક કરો, તેમાં છેલ્લે '/' હોવો જોઈએ
-move_uploaded_file($_FILES['brochure']['tmp_name'], "uploads/pdf/" . $brochure_name);
-                $additional_images[] = $file_name;
+                // સાચું ફાઈલ નામ બનાવો
+                $ext_file_name = time() . "_ext_" . $_FILES['extra_images']['name'][$key];
+                
+                // મહત્વનો સુધારો: ફાઈલને 'uploads/' ફોલ્ડરમાં મૂકો (pdf માં નહીં)
+                if(move_uploaded_file($tmp_name, "uploads/" . $ext_file_name)) {
+                    $additional_images[] = $ext_file_name;
+                }
             }
         }
     }
+    $extra_images_str = implode(',', $additional_images);
+
+    // Brochure Handling (આ અલગ રાખો)
     if(isset($_FILES['brochure']['name']) && !empty($_FILES['brochure']['name'])) {
-    $brochure_name = "brochure_" . time() . "_" . $_FILES['brochure']['name'];
-    move_uploaded_file($_FILES['brochure']['tmp_name'], "uploads/pdf/" . $brochure_name);
+        $brochure_name = "brochure_" . time() . "_" . $_FILES['brochure']['name'];
+        move_uploaded_file($_FILES['brochure']['tmp_name'], "uploads/pdf/" . $brochure_name);
     }
     $extra_images_str = implode(',', $additional_images);
     
@@ -249,6 +255,43 @@ move_uploaded_file($_FILES['brochure']['tmp_name'], "uploads/pdf/" . $brochure_n
                 
             </div>
         `;
+        }
+        // Hair Care ID (તમારી સાચી ID અહીં લખો, દા.ત. 5)
+        else if (catId == "5") {
+            container.classList.remove('hidden');
+            container.innerHTML = `
+        <h3 class="text-[10px] font-black uppercase text-purple-600 mb-3 tracking-tighter italic">Hair Care Details</h3>
+        <div class="space-y-4">
+            <select name="extra[item_form]" class="w-full border border-purple-100 p-2 text-sm rounded-lg outline-none" required>
+                <option value="">Select Item Form</option>
+                <option value="Shampoo">Shampoo</option>
+                <option value="Oil">Oil</option>
+                <option value="Serum">Serum</option>
+                <option value="Conditioner">Conditioner</option>
+                <option value="Mask">Mask</option>
+            </select>
+            <input type="text" name="extra[scent_net]" class="w-full border border-purple-100 p-2 text-sm rounded-lg outline-none" placeholder="Scent / Net Weight (e.g. Lavender 200ml)" required>
+            <input type="text" name="extra[quantity_pack]" class="w-full border border-purple-100 p-2 text-sm rounded-lg outline-none" placeholder="Quantity in Pack (e.g. Pack of 1)" required>
+            <textarea name="extra[composition]" class="w-full border border-purple-100 p-2 text-sm rounded-lg outline-none" placeholder="Composition / Ingredients" rows="2"></textarea>
+        </div>
+    `;
+        }
+        // Apple Besan ID (તમારી સાચી ID અહીં લખો, દા.ત. 6)
+        else if (catId == "6") {
+            container.classList.remove('hidden');
+            container.innerHTML = `
+        <h3 class="text-[10px] font-black uppercase text-yellow-600 mb-3 tracking-tighter italic">Besan Packaging Details</h3>
+        <div class="space-y-4">
+            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Select Packet Size</label>
+            <select name="extra[packet_size]" class="w-full border border-yellow-100 p-2 text-sm rounded-lg outline-none" required>
+                <option value="">Choose Size</option>
+                <option value="10kgs">10 Kgs</option>
+                <option value="30kgs">30 Kgs</option>
+                <option value="50kgs">50 Kgs</option>
+            </select>
+            <input type="text" name="extra[grade]" class="w-full border border-yellow-100 p-2 text-sm rounded-lg outline-none" placeholder="Quality Grade (e.g. Premium, Super Fine)">
+        </div>
+    `;
         } else {
             container.classList.add('hidden');
             container.innerHTML = "";

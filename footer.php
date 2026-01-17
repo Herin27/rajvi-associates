@@ -93,7 +93,7 @@
     </div>
 
     <div class="pt-8 text-center text-gray-500 text-xs tracking-wide">
-        <p>© 2026 Luxury Store Powerd By <span><a style="text-decoration: none; color: #fff;"
+        <p>© 2026 Rajvi Associates Powerd By <span><a style="text-decoration: none; color: #fff;"
                     href="https://www.veloxgroup.co.in/">Velox Group</a></span>. All rights reserved.</p>
     </div>
 </footer>

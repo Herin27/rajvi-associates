@@ -22,6 +22,7 @@ if(isset($_POST['update_product'])) {
     $short_desc = mysqli_real_escape_string($conn, $_POST['short_desc']);
     $long_desc = mysqli_real_escape_string($conn, $_POST['long_desc']);
     $features = mysqli_real_escape_string($conn, $_POST['features']);
+    $additional_images_str = $data['additional_images'];
     
     // ડિસ્કાઉન્ટ ગણતરી
     $discount_percent = ($o_price > 0) ? round((($o_price - $d_price) / $o_price) * 100) : 0;
@@ -40,15 +41,33 @@ if(!empty($_FILES['brochure']['name'])) {
     $brochure_pdf = "brochure_" . time() . "_" . $_FILES['brochure']['name'];
     move_uploaded_file($_FILES['brochure']['tmp_name'], "uploads/pdf/" . $brochure_pdf);
 }
+if(isset($_FILES['extra_images']) && !empty($_FILES['extra_images']['name'][0])) {
+    $new_extras = [];
+    foreach($_FILES['extra_images']['tmp_name'] as $key => $tmp_name) {
+        if(!empty($tmp_name)) {
+            $ext_name = time() . "_ext_" . $_FILES['extra_images']['name'][$key];
+            move_uploaded_file($tmp_name, "uploads/" . $ext_name);
+            $new_extras[] = $ext_name;
+        }
+    }
+    
+    if(!empty($new_extras)) {
+        // જો અગાઉથી ઈમેજીસ હોય તો તેની પાછળ નવી ઉમેરો
+        $additional_images_str = !empty($data['additional_images']) 
+            ? $data['additional_images'] . "," . implode(',', $new_extras) 
+            : implode(',', $new_extras);
+    }
+}
 
 // ક્વેરીમાં brochure_pdf = '$brochure_pdf' ઉમેરો
 $update_query = "UPDATE products SET 
     category_id='$cat_id', product_name='$name', brand='$brand', sku='$sku', 
     original_price='$o_price', discounted_price='$d_price', 
-    discount_percent='$discount_percent', min_qty='$min_qty', rating='$rating', 
-    available_units='$units', short_description='$short_desc', 
+    rating='$rating', available_units='$units', short_description='$short_desc', 
     long_description='$long_desc', key_features='$features', 
-    image='$image', brochure_pdf='$brochure_pdf' WHERE id='$id'";
+    image='$image', brochure_pdf='$brochure_pdf', 
+    additional_images='$additional_images_str' 
+    WHERE id='$id'";
 
     if(mysqli_query($conn, $update_query)) {
         header("Location: admin_dashboard.php?success=1"); // ડેશબોર્ડ પર પાછા જાઓ
@@ -150,9 +169,12 @@ $update_query = "UPDATE products SET
                                 required>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Rating</label>
-                            <input type="number" step="0.1" name="rating" value="<?php echo $data['rating']; ?>"
-                                class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-white">
+                            <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Product Rating
+                                (1-5)</label>
+                            <input type="number" step="0.1" min="1" max="5" name="rating"
+                                value="<?php echo $data['rating']; ?>"
+                                class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-blue-500 outline-none transition bg-white"
+                                required>
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Units</label>
@@ -190,6 +212,35 @@ $update_query = "UPDATE products SET
                         <input type="file" name="pimage"
                             class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
                         <input type="hidden" name="min_qty" value="<?php echo $data['min_qty']; ?>">
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mt-6">
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-6">Gallery Images</h3>
+
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold uppercase text-gray-500 mb-3">Current Additional
+                                Images</label>
+                            <div class="flex flex-wrap gap-4">
+                                <?php 
+            if(!empty($data['additional_images'])) {
+                $imgs = explode(',', $data['additional_images']);
+                foreach($imgs as $img) {
+                    echo '<div class="relative w-20 h-20 border rounded-xl overflow-hidden group shadow-sm bg-gray-50 flex items-center justify-center p-1">
+                            <img src="uploads/'.trim($img).'" class="max-w-full max-h-full object-contain">
+                          </div>';
+                }
+            } else {
+                echo '<p class="text-xs text-gray-400 italic">No additional images added.</p>';
+            }
+            ?>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Add More Images</label>
+                            <input type="file" name="extra_images[]" multiple
+                                class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer">
+                            <p class="text-[9px] text-gray-400 mt-2 italic">*You can select multiple files at once.</p>
+                        </div>
                     </div>
                     <div class="mt-4 w-full">
                         <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Update Brochure

@@ -5,6 +5,12 @@ include 'db.php';
 $product_id = isset($_GET['id']) ? $_GET['id'] : 0;
 $query = mysqli_query($conn, "SELECT * FROM products WHERE id = '$product_id'");
 $product = mysqli_fetch_assoc($query);
+// ૧. સાઇટ સેટિંગ્સ મેળવો (On/Off Control માટે)
+$settings_query = mysqli_query($conn, "SELECT * FROM site_settings");
+$ui = [];
+while($s = mysqli_fetch_assoc($settings_query)) {
+    $ui[$s['feature_key']] = $s['is_enabled'];
+}
 
 if (!$product) {
     echo "Product not found!";
@@ -23,6 +29,7 @@ if (!$product) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
+
 <body class="bg-gray-50">
     <?php include 'header.php'; ?>
 
@@ -34,28 +41,48 @@ if (!$product) {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12 bg-white p-8 rounded-3xl shadow-sm items-start">
             <div class="sticky top-24">
                 <div
-                    class="w-full bg-gray-100 rounded-3xl overflow-hidden mb-6 shadow-inner border border-gray-100 flex items-center justify-center h-[500px]">
+                    class="relative group bg-white rounded-[2.5rem] overflow-hidden mb-8 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-center h-[550px] transition-all duration-500 hover:shadow-[0_30px_60px_rgba(0,0,0,0.1)]">
+
+                    <div
+                        class="absolute -top-24 -left-24 w-64 h-64 bg-yellow-100/30 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                    </div>
+                    <div
+                        class="absolute -bottom-24 -right-24 w-64 h-64 bg-blue-100/30 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                    </div>
+
                     <img src="uploads/<?php echo $product['image']; ?>"
-                        class="max-w-full max-h-full object-contain p-4 transition-all duration-500" id="mainImage">
+                        class="max-w-[85%] max-h-[85%] object-contain transition-all duration-700 ease-out group-hover:scale-110 drop-shadow-2xl"
+                        id="mainImage" alt="<?php echo $product['product_name']; ?>">
+
+                    <div class="absolute top-6 left-6">
+                        <span
+                            class="bg-black/5 backdrop-blur-md border border-white/20 text-black text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-sm">
+                            Premium Quality
+                        </span>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-4 gap-4">
-                    <div class="aspect-square border-2 border-yellow-500 rounded-2xl p-1 cursor-pointer bg-white overflow-hidden shadow-sm"
+                <div class="grid grid-cols-4 gap-5 px-2">
+                    <div class="aspect-square border-2 border-yellow-500 rounded-2xl p-2 cursor-pointer bg-white shadow-md transition-all hover:-translate-y-1 overflow-hidden"
                         onclick="changeImage('uploads/<?php echo $product['image']; ?>', this)">
                         <img src="uploads/<?php echo $product['image']; ?>"
-                            class="w-full h-full object-cover rounded-xl">
+                            class="w-full h-full object-contain rounded-lg">
                     </div>
 
                     <?php 
-                    if(!empty($product['additional_images'])) {
-                        $extras = explode(',', $product['additional_images']);
-                        foreach($extras as $img) {
-                            echo '<div class="aspect-square border-2 border-transparent hover:border-yellow-500 rounded-2xl p-1 cursor-pointer bg-white overflow-hidden transition-all shadow-sm" onclick="changeImage(\'uploads/'.trim($img).'\', this)">
-                                    <img src="uploads/'.trim($img).'" class="w-full h-full object-cover rounded-xl">
-                                  </div>';
-                        }
-                    }
-                    ?>
+                if(!empty($product['additional_images'])) {
+    // અલ્પવિરામથી ઇમેજ અલગ કરો
+    $extras = explode(',', $product['additional_images']);
+    foreach($extras as $img) {
+        $img_name = trim($img); // વધારાની સ્પેસ દૂર કરો
+        if(!empty($img_name)) { // જો નામ ખાલી ન હોય તો જ બતાવો
+            echo '<div class="aspect-square border-2 border-transparent hover:border-yellow-500 rounded-2xl p-2 cursor-pointer bg-white shadow-sm transition-all hover:-translate-y-1 overflow-hidden" onclick="changeImage(\'uploads/'.$img_name.'\', this)">
+                    <img src="uploads/'.$img_name.'" class="w-full h-full object-contain rounded-lg" onerror="this.parentElement.style.display=\'none\'">
+                </div>';
+        }
+    }
+}
+                ?>
                 </div>
             </div>
 
@@ -68,14 +95,28 @@ if (!$product) {
                 <h1 class="text-4xl font-serif font-bold text-gray-900 mt-4"><?php echo $product['product_name']; ?>
                 </h1>
 
-                <div class="flex items-center gap-2 mt-2">
-                    <div class="text-yellow-400 text-sm">
-                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i
-                            class="fa fa-star"></i><i class="fa fa-star"></i>
+                <?php if($ui['show_rating']): // Rating Toggle Check ?>
+                <div class="flex items-center gap-3 mt-2">
+                    <div class="flex text-yellow-400 text-sm">
+                        <?php 
+        $current_rating = (float)$product['rating']; // ડેટાબેઝમાંથી રેટિંગ લેવું
+        for($i = 1; $i <= 5; $i++) {
+            if($i <= $current_rating) {
+                echo '<i class="fa-solid fa-star"></i>'; // આખો ભરેલો સ્ટાર
+            } elseif($i - 0.5 <= $current_rating) {
+                echo '<i class="fa-solid fa-star-half-stroke"></i>'; // અડધો સ્ટાર
+            } else {
+                echo '<i class="fa-regular fa-star text-gray-300"></i>'; // ખાલી સ્ટાર
+            }
+        }
+        ?>
                     </div>
-                    <span class="text-gray-400 text-xs">4.8 (124 reviews)</span>
+                    <span class="text-gray-500 text-xs font-bold"><?php echo number_format($product['rating'], 1); ?>
+                        Rating</span>
                 </div>
+                <?php endif; ?>
 
+                <?php if($ui['show_price']): // જો પ્રાઈસ ઓન હોય તો જ બતાવો ?>
                 <div class="flex items-baseline gap-4 mt-6">
                     <span
                         class="text-4xl font-bold text-yellow-600">₹<?php echo number_format($product['discounted_price']); ?></span>
@@ -84,6 +125,7 @@ if (!$product) {
                     <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded">Save
                         <?php echo $product['discount_percent']; ?>%</span>
                 </div>
+                <?php endif; ?>
 
                 <p class="text-gray-500 mt-6 leading-relaxed"><?php echo $product['short_description']; ?></p>
 
@@ -236,7 +278,11 @@ if (!$product) {
                             class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-110">
                     </div>
                     <h3 class="font-bold text-gray-800"><?php echo $r['product_name']; ?></h3>
+                    <!-- <p class="text-yellow-600 font-bold">₹<?php echo number_format($r['discounted_price']); ?></p> -->
+
+                    <?php if($ui['show_price']): ?>
                     <p class="text-yellow-600 font-bold">₹<?php echo number_format($r['discounted_price']); ?></p>
+                    <?php endif; ?>
                 </a>
                 <?php } ?>
             </div>
@@ -247,11 +293,22 @@ if (!$product) {
 
     <script>
     function changeImage(src, element) {
-        document.getElementById('mainImage').src = src;
-        // active thumbnail border update
-        document.querySelectorAll('.aspect-square').forEach(el => el.classList.replace('border-yellow-500',
-            'border-transparent'));
-        element.classList.replace('border-transparent', 'border-yellow-500');
+        const mainImg = document.getElementById('mainImage');
+
+        // Smooth transition effect
+        mainImg.style.opacity = '0';
+        setTimeout(() => {
+            mainImg.src = src;
+            mainImg.style.opacity = '1';
+
+            // Active border update
+            document.querySelectorAll('.thumb-node').forEach(el => {
+                el.classList.remove('border-yellow-500');
+                el.classList.add('border-transparent');
+            });
+            element.classList.remove('border-transparent');
+            element.classList.add('border-yellow-500');
+        }, 200);
     }
 
     // મોડલ ખોલવા/બંધ કરવા માટે

@@ -8,6 +8,11 @@ $cat_id = isset($_GET['id']) ? $_GET['id'] : 0;
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'latest';
 $selected_brands = isset($_GET['brands']) ? $_GET['brands'] : [];
 $rating = isset($_GET['rating']) ? $_GET['rating'] : 0;
+$settings_query = mysqli_query($conn, "SELECT * FROM site_settings");
+$ui = [];
+while($s = mysqli_fetch_assoc($settings_query)) {
+    $ui[$s['feature_key']] = $s['is_enabled'];
+}
 
 // નવું સ્ટોક ફિલ્ટર વેરીએબલ (Default: 'In Stock' પ્રોડક્ટ્સ જ બતાવો)
 $stock_status = isset($_GET['stock_status']) ? $_GET['stock_status'] : 'In Stock';
@@ -177,7 +182,8 @@ $products = mysqli_query($conn, $sql);
         <aside
             class="w-72 hidden lg:block sticky top-24 h-[calc(100vh-100px)] overflow-y-auto no-scrollbar border-r pr-6">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-black italic tracking-tighter">FILTERS</h2>
+                <h2 class="text-2xl font-black italic tracking-tighter">Sort By
+                </h2>
                 <a href="category.php"
                     class="text-[10px] font-bold text-blue-600 underline uppercase tracking-widest hover:text-black transition">
                     Clear All
@@ -186,7 +192,6 @@ $products = mysqli_query($conn, $sql);
 
             <form action="" method="GET" id="filterForm">
                 <div class="mb-8">
-                    <h3 class="font-bold text-xs uppercase tracking-widest mb-4 text-gray-400">Sort By</h3>
                     <select name="sort" onchange="this.form.submit()"
                         class="w-full border-b-2 border-black py-2 text-sm outline-none font-semibold">
                         <option value="latest" <?php if($sort == 'latest') echo 'selected'; ?>>Newest First</option>
@@ -390,29 +395,34 @@ $products = mysqli_query($conn, $sql);
                         <div class="flex justify-between items-start mb-2">
                             <h4 class="font-bold text-[#111827] text-sm truncate max-w-[150px]">
                                 <?php echo $row['product_name']; ?></h4>
+
+                            <?php if($ui['show_rating']): // Rating Toggle Check ?>
                             <div class="flex text-yellow-400 text-[8px] gap-0.5 mt-1">
                                 <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i
                                     class="fa fa-star"></i><i class="fa fa-star"></i>
                             </div>
+                            <?php endif; ?>
                         </div>
 
+                        <?php if($ui['show_price']): // Price Toggle Check ?>
                         <div class="flex items-baseline gap-2 mb-4">
                             <span
                                 class="text-xl font-black text-[#111827]">₹<?php echo number_format($row['discounted_price']); ?></span>
-                            <?php if(isset($row['original_price']) && $row['original_price'] > $row['discounted_price']): ?>
+                            <?php if($row['original_price'] > $row['discounted_price']): ?>
                             <span
                                 class="text-xs text-gray-400 line-through font-medium">₹<?php echo number_format($row['original_price']); ?></span>
                             <?php endif; ?>
                         </div>
+                        <?php endif; ?>
 
                         <div class="mt-auto space-y-2">
                             <button onclick="addToInquiry(<?php echo $p_id; ?>, <?php echo $row['min_qty']; ?>)"
-                                class="w-full bg-black text-white py-3 rounded-lg font-bold text-[11px] uppercase tracking-widest transition-all hover:bg-gray-800 flex items-center justify-center gap-2">
+                                class="w-full bg-black text-white py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest transition-all hover:bg-gray-800 flex items-center justify-center gap-2">
                                 <i class="fa fa-list-check"></i> Add to Inquiry
                             </button>
                             <div class="text-center">
                                 <span
-                                    class="text-[9px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase">MOQ:
+                                    class="text-[12px] font-bold text-red-600 bg-blue-50 px-2 py-1 rounded uppercase">MOQ:
                                     <?php echo $row['min_qty']; ?> Units</span>
                             </div>
                         </div>
